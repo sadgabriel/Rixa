@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "format-competition-analyze.json",
+  "title": "CompetitionAnalyzeBatchOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["phase", "results"],
+  "properties": {
+    "phase": { "type": "string", "const": "competition_analyze" },
+    "results": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "description": "One analysis result per match, in the same order as input.",
+      "items": { "$ref": "#/$defs/matchResult" }
+    }
+  },
+  "$defs": {
+    "tagItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "effect"],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "enum": [
+            "internal_coherence",
+            "explicit_justification",
+            "mechanism_explained",
+            "coherent_plan",
+            "uses_opponent_weakness",
+            "uses_world_fact",
+            "leverages_faction_trait",
+            "anticipates_response",
+            "direct_counter",
+            "clever_twist",
+            "misinformation_or_deception",
+            "psychological_pressure",
+            "collateral_pressure",
+            "high_risk_high_reward",
+            "chaos_amplifier",
+            "escalation_of_stakes",
+            "focus_clear",
+            "nonresponsive",
+            "vague_or_empty",
+            "handwave",
+            "leap_of_logic",
+            "unsupported_claim",
+            "self_contradiction",
+            "deterministic_claim",
+            "self_sabotage",
+            "overreach"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": ["boost", "penalty", "risk", "neutral"]
+        }
+      }
+    },
+    "sideAnalysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tags"],
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/tagItem" },
+          "description": "Interpretive tags for this side."
+        }
+      }
+    },
+    "matchResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["match_id", "attacker", "defender", "targeted_resources", "protected_resources"],
+      "properties": {
+        "match_id": {
+          "type": "string",
+          "pattern": "^m_[0-9]{2}$",
+          "description": "Match identifier from input (e.g., m_01)."
+        },
+        "attacker": { "$ref": "#/$defs/sideAnalysis" },
+        "defender": { "$ref": "#/$defs/sideAnalysis" },
+        "targeted_resources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Defender resources intentionally targeted by attacker. Use only names provided in input for this match."
+        },
+        "protected_resources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Defender resources actively protected by defender. Use only names provided in input for this match."
+        }
+      }
+    }
+  }
+}

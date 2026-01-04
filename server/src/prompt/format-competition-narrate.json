@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "format-competition-narrate.json",
+  "title": "CompetitionNarrateBatchOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["phase", "results"],
+  "properties": {
+    "phase": { "type": "string", "const": "competition_narrate" },
+    "results": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/matchNarration" },
+      "description": "One narration per match, in the same order as input."
+    }
+  },
+  "$defs": {
+    "matchNarration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["match_id", "display_narrative", "context_logs"],
+      "properties": {
+        "match_id": {
+          "type": "string",
+          "pattern": "^m_[0-9]{2}$",
+          "description": "Match identifier from input (e.g., m_01)."
+        },
+        "display_narrative": {
+          "type": "string",
+          "minLength": 120,
+          "maxLength": 1600,
+          "description": "Player-facing narrative reflecting the resolved outcome and given resource changes."
+        },
+        "context_logs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": { "type": "string", "minLength": 20, "maxLength": 220 },
+          "description": "Concise log lines to accumulate and pass into future prompts."
+        }
+      }
+    }
+  }
+}

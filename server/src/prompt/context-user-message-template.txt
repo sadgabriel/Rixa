@@ -1,0 +1,12 @@
+INPUT DATA (JSON):
+{INPUT_JSON}
+
+────────────────────────────────
+
+OUTPUT FORMAT (JSON SCHEMA):
+{FORMAT_CONTEXT_JSON}
+
+────────────────────────────────
+
+Return a JSON object that strictly conforms to the schema above.
+Output JSON only. Do not include explanations or commentary.

@@ -1,0 +1,129 @@
+[RULE — CORE GAME RULES]
+
+This document defines the immutable rules and structural principles
+of the game. These rules describe what the game IS,
+not what a specific task SHOULD DO.
+
+This game assumes and permits unrealistic, exaggerated,
+and absurd elements as a normal state of the competitive context.
+Unrealism is not an error condition.
+
+────────────────────────────────
+1. GAME STRUCTURE AND PHASE SEPARATION
+────────────────────────────────
+
+1.1 The game consists of distinct conceptual phases, including:
+    - context and faction definition,
+    - competition resolution,
+    - and optional context expansion.
+1.2 Each phase serves a different purpose and must not be conflated.
+1.3 Results produced in any phase, once confirmed,
+    become part of the persistent game state.
+
+────────────────────────────────
+2. CANONICAL STATE AND INTERPRETATION
+────────────────────────────────
+
+2.1 Context and faction definitions, once finalized,
+    constitute the canonical state of the game.
+2.2 Canonical state must be respected by all subsequent resolutions.
+2.3 During an explicit context expansion phase,
+    canonical information may be extended or reinterpreted,
+    but must not be directly contradicted.
+2.4 Canonical state represents established conditions and facts;
+    interpretations, implications, and meanings may evolve over time.
+
+────────────────────────────────
+3. UNREALISM AS A BASELINE ASSUMPTION
+────────────────────────────────
+
+3.1 The competitive context may violate real-world physics, logic,
+    scale, causality, or common sense.
+3.2 Such violations are intentional and must not be treated
+    as inconsistencies to be corrected or normalized.
+3.3 Unrealistic properties of the context or factions
+    are part of canonical state once finalized.
+3.4 Absurdity, exaggeration, and excess define the possibility space
+    of competition and must not be suppressed
+    by realism-based reasoning.
+
+────────────────────────────────
+4. FACTIONS AND RESOURCES
+────────────────────────────────
+
+4.1 Each faction is associated with exactly three resource types.
+4.2 Resources represent abstract strategic capacity,
+    not literal physical quantities.
+4.3 A resource value of zero does NOT imply total narrative absence.
+4.4 Resources may be material, emotional, ideological,
+    symbolic, or otherwise non-physical in nature.
+4.5 Resources exist to express pressure, constraint,
+    and long-term consequences rather than immediate capability.
+
+────────────────────────────────
+5. COMPETITION AS QUALITATIVE RESOLUTION
+────────────────────────────────
+
+5.1 Competitions are resolved through qualitative judgment,
+    not numerical simulation.
+5.2 Outcomes are determined by narrative plausibility,
+    contextual effectiveness, and relative risk,
+    not by the absolute power implied by setting descriptions.
+5.3 Extreme or reality-breaking capabilities
+    do not guarantee deterministic success.
+
+────────────────────────────────
+6. ASSERTION AND RESISTANCE PRINCIPLES
+────────────────────────────────
+
+6.1 Assertive or offensive actions do NOT consume resources.
+6.2 Resources may be affected only as a consequence of
+    failed or insufficient resistance.
+6.3 Resource loss reflects strain, disruption,
+    or accumulated cost rather than instant destruction.
+
+────────────────────────────────
+7. RESOURCE SCARCITY AND CONSEQUENCES
+────────────────────────────────
+
+7.1 Resource scarcity increases vulnerability and pressure,
+    but does not create absolute impossibility.
+7.2 Even when numeric resources are low or depleted,
+    factions may still act with narrative consequences.
+7.3 Scarcity should influence future outcomes
+    through escalating risk rather than hard denial.
+
+────────────────────────────────
+8. COMPETITION CONSEQUENCES AND CONTEXT IMPACT
+────────────────────────────────
+
+8.1 Competition outcomes may have implications
+    beyond immediate success or failure.
+8.2 Such implications may affect:
+    - faction perception, morale, or identity,
+    - contextual tension, instability, or tone,
+    - or the direction of future competitive narratives.
+8.3 These implications represent interpretive impact,
+    not automatic canonical change.
+8.4 Canonical changes may only occur
+    during an explicit context expansion phase.
+
+────────────────────────────────
+9. CONTINUITY AND IRREVERSIBILITY
+────────────────────────────────
+
+9.1 Once a competition outcome and its consequences are confirmed,
+    they become irreversible parts of the game state.
+9.2 Subsequent resolutions must respect accumulated outcomes.
+9.3 Retroactive alteration of resolved events is not allowed.
+
+────────────────────────────────
+10. NARRATIVE FREEDOM AND CONTROLLED CHAOS
+────────────────────────────────
+
+10.1 Narrative surprises, twists, and extreme developments
+     are an intended feature of the game.
+10.2 Such developments must not contradict
+     established canonical conditions or confirmed outcomes.
+10.3 Chaos enriches the game only when
+     internal consistency is preserved.
