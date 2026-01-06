@@ -1,10 +1,10 @@
 INPUT DATA (JSON):
-{INPUT_JSON}
+{{INPUT}}
 
 ────────────────────────────────
 
 OUTPUT FORMAT (JSON SCHEMA):
-{FORMAT_CONTEXT_JSON}
+{{FORMAT}}
 
 ────────────────────────────────
 
