@@ -5,17 +5,19 @@ import * as Errors from './errors.js';
 
 export const GamePhase = Object.freeze({
     LOBBY: 'lobby',
-    CONTEXT_SETTING: 'context_setting',
-    FACTION_CONCEPT_SETTING: 'faction_concept_setting',
-    FACTION_FLAW_SETTING: 'faction_flaw_setting',
-    SETTING_EVALUATION: 'setting_evaluation',
+    CONTEXT_INPUT: 'context_input',
+    FACTION_CONCEPT_INPUT: 'faction_concept_input',
+    FACTION_FLAW_INPUT: 'faction_flaw_input',
+    CONTEXT_SETUP: 'context_setup',
     ATTACK: 'attack',
     DEFENSE: 'defense',
-    COMPETITION_EVALUATION: 'competition_evaluation',
+    COMPETITION_ANALYZE: 'competition_analyze',
+    COMPETITION_NARRATE: 'competition_narrate',
     END: 'end',
 });
 
 const TOTAL_ROUNDS = 6;
+const MAX_RESOURCE = 3;
 
 export class Game {
     #id;
@@ -28,6 +30,7 @@ export class Game {
         this.idToFactionMap = new Map();
         this.round = 0;
         this.rawContextDescription = null;
+        this.context = null;
         this.roundOffsets = [];
         this.playerCycle = [];
         this.currentMatches = [];
@@ -73,7 +76,7 @@ export class Game {
 
         this._createFactions();
 
-        this.phase = GamePhase.CONTEXT_SETTING;
+        this.phase = GamePhase.CONTEXT_INPUT;
     }
 
     _createFactions() {
@@ -87,16 +90,16 @@ export class Game {
 }
 
     setRawContext(rawContextDescription) {
-        if (this.phase !== GamePhase.CONTEXT_SETTING) {
+        if (this.phase !== GamePhase.CONTEXT_INPUT) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
         this.rawContextDescription = rawContextDescription;
-        this.phase = GamePhase.FACTION_CONCEPT_SETTING;
+        this.phase = GamePhase.FACTION_CONCEPT_INPUT;
     }
 
     setRawFactionConcept(factionId, rawConceptDescription) {
-        if (this.phase !== GamePhase.FACTION_CONCEPT_SETTING) {
+        if (this.phase !== GamePhase.FACTION_CONCEPT_INPUT) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
@@ -108,12 +111,12 @@ export class Game {
         faction.rawConcept = rawConceptDescription;
 
         if (this.factions.every(f => f.rawConcept !== null)) {
-            this.phase = GamePhase.FACTION_FLAW_SETTING;
+            this.phase = GamePhase.FACTION_FLAW_INPUT;
         }
     }
 
     setRawFactionFlaw(factionId, rawFlawDescription) {
-        if (this.phase !== GamePhase.FACTION_FLAW_SETTING) {
+        if (this.phase !== GamePhase.FACTION_FLAW_INPUT) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
@@ -125,25 +128,35 @@ export class Game {
         faction.rawFlaw = rawFlawDescription;
 
         if (this.factions.every(f => f.rawFlaw !== null)) {
-            this.phase = GamePhase.SETTING_EVALUATION;
-            // TBD: Trigger evaluation
+            this.phase = GamePhase.CONTEXT_SETUP;
         }
     }
 
-    async _evaluateSetting() {
-        if (this.phase !== GamePhase.SETTING_EVALUATION) {
+    async setupContext() {
+        if (this.phase !== GamePhase.CONTEXT_SETUP) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        // TBD: Use judge to evaluate context and faction 
+        const result = await this.#judge.setupContext(this.rawContextDescription, this.factions);
 
-        this.phase = GamePhase.ATTACK;
+        this.context = result.context;
+        for (const factionResult of result.factions) {
+            const faction = this.idToFactionMap.get(factionResult.id);
+            if (faction) {
+                faction.summary = factionResult.summary;
+                faction.resources = factionResult.resources;
+                for (const resource of faction.resources) {
+                    resource.count = MAX_RESOURCE;
+                }
+            }
+        }
+
         this.round = 1;
 
         this.playerCycle = shuffle(this.players);
         this._generateRoundOffsets();
         this._createMatches();
-        
+        this.phase = GamePhase.ATTACK;
     }
 
     _generateRoundOffsets() {
@@ -185,6 +198,10 @@ export class Game {
     }
 
     submitAttack(attackerId, attackDescription) {
+        if (this.phase !== GamePhase.ATTACK) {
+            throw new Errors.InvalidGamePhaseError(this.phase);
+        }
+
         const match = this.findMatchByAttacker(attackerId);
         if (!match) {
             throw new Errors.MatchNotFoundError(attackerId);
@@ -197,6 +214,10 @@ export class Game {
     }
 
     submitDefense(defenderId, defenseDescription) {
+        if (this.phase !== GamePhase.DEFENSE) {
+            throw new Errors.InvalidGamePhaseError(this.phase);
+        }
+
         const match = this.findMatchByDefender(defenderId);
         if (!match) {
             throw new Errors.MatchNotFoundError(defenderId);
@@ -204,17 +225,35 @@ export class Game {
         match.defenseDescription = defenseDescription;
 
         if (this.currentMatches.every(m => m.defenseDescription !== null)) {
-            this.phase = GamePhase.COMPETITION_EVALUATION;
-
-            // TBD: Trigger battle evaluation
+            this.phase = GamePhase.COMPETITION_ANALYZE;
         }
     }
 
-    async _evaluateBattles() {
+    async competitionAnalyze() {
+        if (this.phase !== GamePhase.COMPETITION_ANALYZE) {
+            throw new Errors.InvalidGamePhaseError(this.phase);
+        }
 
+        // TBD: call judge to analyze competition
+
+        this.phase = GamePhase.COMPETITION_NARRATE;
     }
 
-    
+    async competitionNarrate() {
+        if (this.phase !== GamePhase.COMPETITION_NARRATE) {
+            throw new Errors.InvalidGamePhaseError(this.phase);
+        }
+
+        // TBD: call judge to narrate competition
+
+        if (this.round >= TOTAL_ROUNDS) {
+            this.phase = GamePhase.END;
+        } else {
+            this.round += 1;
+            this._createMatches();
+            this.phase = GamePhase.ATTACK;
+        }
+    }
 }
 
 function shuffle(array) {

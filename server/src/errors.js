@@ -86,4 +86,17 @@ export class SocketNotOpenError extends Error {
     }
 }
 
+export class JudgeCallError extends Error {
+    constructor(message) {
+        super(`Judge call failed: ${message}`);
+        this.name = 'JudgeCallError';
+    }
+}
+
+export class InvalidJudgeResponseError extends Error {
+    constructor(message) {
+        super(`Invalid judge response: ${message}`);
+        this.name = 'InvalidJudgeResponseError';
+    }
+}
 

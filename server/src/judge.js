@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import OpenAI from "openai";
 import "dotenv/config";
+import * as Errors from './errors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,21 +24,23 @@ export class Judge {
 
         this.POLICY = loadPrompt("policy.txt");
         this.RULE = loadPrompt("rule.txt");
-        this.ROLE_CONTEXT = loadPrompt("role_context.txt");
-        this.ROLE_COMPETITION_ANALYZE = loadPrompt("role_competition_analyze.txt");
-        this.ROLE_COMPETITION_NARRATE = loadPrompt("role_competition_narrate.txt");
-        this.USER_MESSAGE_TEMPLATE = loadPrompt("user_message_template.txt");
-        this.DEVELOPER_MESSAGE_TEMPLATE = loadPrompt("developer_message_template.txt");
-        this.FORMAT_CONTEXT = loadPrompt("format_context.json");
-        this.FORMAT_COMPETITION_ANALYZE = loadPrompt("format_competition_analyze.json");
-        this.FORMAT_COMPETITION_NARRATE = loadPrompt("format_competition_narrate.json");
+        this.ROLE_CONTEXT = loadPrompt("role-context.txt");
+        this.ROLE_COMPETITION_ANALYZE = loadPrompt("role-competition-analyze.txt");
+        this.ROLE_COMPETITION_NARRATE = loadPrompt("role-competition-narrate.txt");
+        this.USER_MESSAGE_TEMPLATE = loadPrompt("user-message-template.txt");
+        this.DEVELOPER_MESSAGE_TEMPLATE = loadPrompt("developer-message-template.txt");
+        this.FORMAT_CONTEXT = loadPrompt("format-context.json");
+        this.FORMAT_COMPETITION_ANALYZE = loadPrompt("format-competition-analyze.json");
+        this.FORMAT_COMPETITION_NARRATE = loadPrompt("format-competition-narrate.json");
     }
 
     resetSession() {
         this.previousResponseId = null;
     }
 
-    async evaluateSetting(rawContextDescription, factions) {
+    async setupContext(rawContextDescription, factions) {
+        this.resetSession();
+
         const developerText = this.DEVELOPER_MESSAGE_TEMPLATE
             .replace("{{POLICY}}", this.POLICY)
             .replace("{{RULE}}", this.RULE)
@@ -66,46 +69,69 @@ export class Judge {
         return this._parseJson(responseText);
     }
 
+    async analyzeCompetition() {
+        const developerText = this.DEVELOPER_MESSAGE_TEMPLATE
+            .replace("{{POLICY}}", this.POLICY)
+            .replace("{{RULE}}", this.RULE)
+            .replace("{{ROLE}}", this.ROLE_COMPETITION_ANALYZE);
+    }
+
+    async narrateCompetition() {
+
+    }
+
     async _call(developerText, userText, outputFormat = null) {
-        const request = {
-            model: this.model,
-            reasoning: { effort: "low" },
-            store: true,
-            input: [
-                { role: "developer", content: developerText },
-                { role: "user", content: userText },
-            ],
-        };
+        try {
+            const request = {
+                model: this.model,
+                reasoning: { effort: "low" },
+                store: true,
+                input: [
+                    { role: "developer", content: developerText },
+                    { role: "user", content: userText },
+                ],
+            };
 
-        if (this.previousResponseId !== null) {
-            request.previous_response_id = this.previousResponseId;
-        }
-
-        if (outputFormat !== null) {
-            request.output_format = {
-                type: "json_schema",
-                schema: outputFormat,
-                strict: true
+            if (this.previousResponseId !== null) {
+                request.previous_response_id = this.previousResponseId;
             }
+
+            if (outputFormat !== null) {
+                request.output_format = {
+                    type: "json_schema",
+                    schema: outputFormat,
+                    strict: true
+                }
+            }
+
+            const response = await this.client.responses.create(request);
+
+            this.previousResponseId = response.id ?? null;
+            return response.output_text ?? "";
+        } catch (error) {
+            throw new Errors.JudgeCallError(error.message);
         }
-
-        const response = await this.client.responses.create(request);
-
-        this.previousResponseId = response.id ?? null;
-        return response.output_text ?? "";
     }
 
     _extractFirstJsonObject(text) {
         const start = text.indexOf("{");
         const end = text.lastIndexOf("}");
         if (start === -1 || end === -1 || end <= start) {
-            throw new Error("No JSON object found in model output.");
+            throw new Errors.InvalidJudgeResponseError("No valid JSON object found in the response.");
         }
         return text.slice(start, end + 1);
         }
 
     _parseJson(text) {
-        const jsonText = this._extractFirstJsonObject(text);
-        return JSON.parse(jsonText);
+        try {
+            const jsonText = this._extractFirstJsonObject(text);
+            return JSON.parse(jsonText);
+        } catch (error) {
+            if (error instanceof Errors.InvalidJudgeResponseError) {
+                throw error;
+            } else {
+                throw new Errors.InvalidJudgeResponseError(error.message);
+            }
+        }
     }
 }

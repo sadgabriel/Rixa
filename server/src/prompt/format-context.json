@@ -11,18 +11,11 @@
       "const": "context_setup"
     },
     "context": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["summary"],
-      "properties": {
-        "summary": {
-          "type": "string",
-          "minLength": 40,
-          "maxLength": 800,
-          "description": "Finalized competitive context (background/stage) description."
-        }
-      }
-    },
+        "type": "string",
+        "minLength": 40,
+        "maxLength": 800,
+        "description": "Finalized competitive context (world/background/stage) description."
+      },
     "factions": {
       "type": "array",
       "minItems": 2,
