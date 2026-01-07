@@ -1,14 +1,42 @@
 {
   "phase": "context_setup",
-  "player_context_description": "string",
+  "context" : {
+    raw_context_description: "string"
+  }
   "factions": [
     {
       "id": "fac_01",
       "name": "string",
-      "concept": "string",
-      "weakness": "string"
+      "rawConcept": "string",
+      "RawFlaw": "string"
     }
   ]
 }
 
-
+{
+  "phase": "competition_analyze",
+  "context" : {
+    description: "string"
+    event_log: "string"
+  }
+  "factions": [
+    {
+      "id": "fac_01",
+      "name": "string",
+      "description": "string",
+      "resources": {
+        "name": "string",
+        "description": "string",
+        "count": "number"
+      }
+    }
+  ],
+  "matches": [
+    {
+      "attackerId": "string",
+      "defenderId": "string",
+      "attackDescription": "string",
+      "defenseDescription": "string"
+    }
+  ]
+}

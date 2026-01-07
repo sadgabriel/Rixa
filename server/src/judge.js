@@ -38,7 +38,7 @@ export class Judge {
         this.previousResponseId = null;
     }
 
-    async setupContext(rawContextDescription, factions) {
+    async setupContext(context, factions) {
         this.resetSession();
 
         const developerText = this.DEVELOPER_MESSAGE_TEMPLATE
@@ -46,18 +46,16 @@ export class Judge {
             .replace("{{RULE}}", this.RULE)
             .replace("{{ROLE}}", this.ROLE_CONTEXT);
 
-        factions = factions.map(faction => {
-            return {
-                id: faction.id,
-                name: faction.name,
-                concept: faction.rawConcept,
-                flaw: faction.rawFlaw
-            }
-        });
+        factions = factions.map(({ id, name, rawConcept, rawFlaw }) => ({
+            id,
+            name,
+            rawConcept,
+            rawFlaw
+        }));
 
         const input = {
             phase: "context_setup",
-            context_draft: rawContextDescription,
+            context: { rawContextDescription: context.rawContextDescription },
             factions: factions
         };
 
@@ -69,14 +67,35 @@ export class Judge {
         return this._parseJson(responseText);
     }
 
-    async analyzeCompetition() {
+    async analyzeCompetition(context, factions, matches) {
         const developerText = this.DEVELOPER_MESSAGE_TEMPLATE
             .replace("{{POLICY}}", this.POLICY)
             .replace("{{RULE}}", this.RULE)
             .replace("{{ROLE}}", this.ROLE_COMPETITION_ANALYZE);
+
+        factions = factions.map(({ id, name, description, resources }) => ({
+            id,
+            name,
+            description,
+            resources
+        }));
+
+        const input = {
+            phase: "competition_analyze",
+            context: { description: context.description, event_log: context.event },
+            factions: factions,
+            matches: matches
+        };
+
+        const userText = this.USER_MESSAGE_TEMPLATE
+            .replace("{{INPUT}}", JSON.stringify(input))
+            .replace("{{FORMAT}}", this.FORMAT_COMPETITION_ANALYZE);
+
+        const responseText = await this._call(developerText, userText, JSON.parse(this.FORMAT_COMPETITION_ANALYZE));
+        return this._parseJson(responseText);
     }
 
-    async narrateCompetition() {
+    async narrateCompetition(context, factions) {
 
     }
 

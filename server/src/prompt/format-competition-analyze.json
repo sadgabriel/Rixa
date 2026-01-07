@@ -4,59 +4,36 @@
   "title": "CompetitionAnalyzeBatchOutput",
   "type": "object",
   "additionalProperties": false,
-  "required": ["phase", "results"],
+  "required": ["phase", "analysisResults"],
   "properties": {
     "phase": { "type": "string", "const": "competition_analyze" },
-    "results": {
+    "analysisResults": {
       "type": "array",
       "minItems": 1,
       "maxItems": 6,
       "description": "One analysis result per match, in the same order as input.",
-      "items": { "$ref": "#/$defs/matchResult" }
+      "items": { "$ref": "#/$defs/matchAnalysis" }
     }
   },
   "$defs": {
-    "tagItem": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["tag", "effect"],
-      "properties": {
-        "tag": {
-          "type": "string",
-          "enum": [
-            "internal_coherence",
-            "explicit_justification",
-            "mechanism_explained",
-            "coherent_plan",
-            "uses_opponent_weakness",
-            "uses_world_fact",
-            "leverages_faction_trait",
-            "anticipates_response",
-            "direct_counter",
-            "clever_twist",
-            "misinformation_or_deception",
-            "psychological_pressure",
-            "collateral_pressure",
-            "high_risk_high_reward",
-            "chaos_amplifier",
-            "escalation_of_stakes",
-            "focus_clear",
-            "nonresponsive",
-            "vague_or_empty",
-            "handwave",
-            "leap_of_logic",
-            "unsupported_claim",
-            "self_contradiction",
-            "deterministic_claim",
-            "self_sabotage",
-            "overreach"
-          ]
-        },
-        "effect": {
-          "type": "string",
-          "enum": ["boost", "penalty", "risk", "neutral"]
-        }
-      }
+    "tag": {
+      "type": "string",
+      "enum": [
+        "coherence",
+        "evidence_and_reasoning",
+        "situational_leverage",
+        "anticipation_and_counterplay",
+        "creativity",
+
+        "deception",
+        "pressure",
+        "escalation",
+        "high_variance",
+
+        "nonresponsive",
+        "unsupported_or_logical_gap",
+        "self_contradiction_or_overreach"
+      ]
     },
     "sideAnalysis": {
       "type": "object",
@@ -65,12 +42,15 @@
       "properties": {
         "tags": {
           "type": "array",
-          "items": { "$ref": "#/$defs/tagItem" },
-          "description": "Interpretive tags for this side."
+          "items": { "$ref": "#/$defs/tag" },
+          "minItems": 0,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "description": "Interpretive tags for this side. Tags are used for scoring; do not repeat."
         }
       }
     },
-    "matchResult": {
+    "matchAnalysis": {
       "type": "object",
       "additionalProperties": false,
       "required": ["match_id", "attacker", "defender", "targeted_resources", "protected_resources"],
@@ -85,11 +65,17 @@
         "targeted_resources": {
           "type": "array",
           "items": { "type": "string" },
+          "minItems": 0,
+          "maxItems": 3,
+          "uniqueItems": true,
           "description": "Defender resources intentionally targeted by attacker. Use only names provided in input for this match."
         },
         "protected_resources": {
           "type": "array",
           "items": { "type": "string" },
+          "minItems": 0,
+          "maxItems": 3,
+          "uniqueItems": true,
           "description": "Defender resources actively protected by defender. Use only names provided in input for this match."
         }
       }

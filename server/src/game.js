@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { createPlayer } from './player.js';
 import { createFaction } from './faction.js';
+import { createMatch } from './match.js';
+import { BALANCE } from './balanceConfig.js';
 import * as Errors from './errors.js';
 
 export const GamePhase = Object.freeze({
@@ -28,12 +30,11 @@ export class Game {
         this.phase = GamePhase.LOBBY;
         this.idToPlayerMap = new Map();
         this.idToFactionMap = new Map();
+        this.idToMatchMap = new Map();
         this.round = 0;
-        this.rawContextDescription = null;
-        this.context = null;
+        this.context = { rawContextDescription: "", description: "", event_log: []};
         this.roundOffsets = [];
         this.playerCycle = [];
-        this.currentMatches = [];
     }
 
     get id() {
@@ -46,6 +47,28 @@ export class Game {
 
     get factions() {
         return Array.from(this.idToFactionMap.values());
+    }
+
+    get matches() {
+        return Array.from(this.idToMatchMap.values());
+    }
+
+    findFactionByPlayerId(playerId) {
+        const player = this.idToPlayerMap.get(playerId);
+        const faction = this.idToFactionMap.get(player.factionId);
+        return faction;
+    }
+
+    findMatchByAttacker(attackerId) {
+        return this.matches.find(match => match.attackerId === attackerId);
+    }
+
+    findMatchByDefender(defenderId) {
+        return this.matches.find(match => match.defenderId === defenderId);
+    }
+
+    findPlayerByFactionId(factionId) {
+        return this.players.find(player => player.factionId === factionId);
     }
 
     addPlayer(name) {
@@ -80,25 +103,25 @@ export class Game {
     }
 
     _createFactions() {
-    let index = 1;
-    for (const player of this.players) {
-        const factionId = `fac_${String(index++).padStart(2, '0')}`;
-        const faction = createFaction(factionId);
-        this.idToFactionMap.set(faction.id, faction);
-        player.factionId = faction.id;
+        let index = 1;
+        for (const player of this.players) {
+            const factionId = `fac_${String(index++).padStart(2, '0')}`;
+            const faction = createFaction(factionId);
+            this.idToFactionMap.set(faction.id, faction);
+            player.factionId = faction.id;
+        }
     }
-}
 
     setRawContext(rawContextDescription) {
         if (this.phase !== GamePhase.CONTEXT_INPUT) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        this.rawContextDescription = rawContextDescription;
+        this.context.rawContextDescription = rawContextDescription;
         this.phase = GamePhase.FACTION_CONCEPT_INPUT;
     }
 
-    setRawFactionConcept(factionId, rawConceptDescription) {
+    setRawFactionConceptAndName(factionId, rawConceptDescription, name) {
         if (this.phase !== GamePhase.FACTION_CONCEPT_INPUT) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
@@ -109,6 +132,7 @@ export class Game {
         }
 
         faction.rawConcept = rawConceptDescription;
+        faction.name = name;
 
         if (this.factions.every(f => f.rawConcept !== null)) {
             this.phase = GamePhase.FACTION_FLAW_INPUT;
@@ -137,13 +161,13 @@ export class Game {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        const result = await this.#judge.setupContext(this.rawContextDescription, this.factions);
+        const output = await this.#judge.setupContext(this.context, this.factions);
 
-        this.context = result.context;
-        for (const factionResult of result.factions) {
+        this.context.description = output.context.summary;
+        for (const factionResult of output.factions) {
             const faction = this.idToFactionMap.get(factionResult.id);
             if (faction) {
-                faction.summary = factionResult.summary;
+                faction.description = factionResult.summary;
                 faction.resources = factionResult.resources;
                 for (const resource of faction.resources) {
                     resource.count = MAX_RESOURCE;
@@ -178,23 +202,17 @@ export class Game {
         const n = playerIds.length;
         const offset = this.roundOffsets[this.round - 1];
         
-        this.currentMatches = [];
+        this.idToMatchMap = new Map();
+        let index = 1;
         for (let i = 0; i < n; i++) {
-            this.currentMatches.push({
-                attackerId: playerIds[i],
-                defenderId: playerIds[(i + offset) % n],
-                attackDescription: null,
-                defenseDescription: null,
-            });
+            const matchId = `m_${String(index++).padStart(2, '0')}`
+            const match = createMatch(matchId);
+
+            match.attackerId = this.findFactionByPlayerId(playerIds[i]).id;
+            match.defenderId = this.findFactionByPlayerId(playerIds[(i + offset) % n]).id;
+            
+            this.idToMatchMap.set(match.id, match);
         }
-    }
-
-    findMatchByAttacker(attackerId) {
-        return this.currentMatches.find(match => match.attackerId === attackerId);
-    }
-
-    findMatchByDefender(defenderId) {
-        return this.currentMatches.find(match => match.defenderId === defenderId);
     }
 
     submitAttack(attackerId, attackDescription) {
@@ -208,7 +226,7 @@ export class Game {
         }
         match.attackDescription = attackDescription;
 
-        if (this.currentMatches.every(m => m.attackDescription !== null)) {
+        if (this.matches.every(m => m.attackDescription !== null)) {
             this.phase = GamePhase.DEFENSE;
         }
     }
@@ -224,22 +242,85 @@ export class Game {
         }
         match.defenseDescription = defenseDescription;
 
-        if (this.currentMatches.every(m => m.defenseDescription !== null)) {
+        if (this.matches.every(m => m.defenseDescription !== null)) {
             this.phase = GamePhase.COMPETITION_ANALYZE;
         }
     }
 
-    async competitionAnalyze() {
+    async analyzeCompetition() {
         if (this.phase !== GamePhase.COMPETITION_ANALYZE) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        // TBD: call judge to analyze competition
+        const output = this.#judge.analyzeCompetition(this.context, this.factions, this.matches);
+
+        for (const matchAnalysis of output.analysisResults) {
+            const match = this.idToMatchMap.get(matchAnalysis.id);
+            match.attackerTags = matchAnalysis.attacker.tags;
+            match.defenderTags = matchAnalysis.defender.tags;
+            match.targeted_resources = matchAnalysis.targeted_resources;
+            match.protected_resources = matchAnalysis.protected_resources;
+        }
+
+        this._calculateCompetition();
 
         this.phase = GamePhase.COMPETITION_NARRATE;
     }
 
-    async competitionNarrate() {
+    _calculateCompetition() {
+        for (const match of this.matches) {
+            let winChance = BALANCE.baseWinChance;
+            let attackerAdvantage = 0;
+            let defenderAdvantage = 0;
+
+            for (const tag of match.attackerTags) {
+                attackerAdvantage += BALANCE.tagWeights[tag] ?? 0;
+            }
+
+            for (const tag of match.defenderTags) {
+                defenderAdvantage += BALANCE.tagWeights[tag] ?? 0;
+            }
+
+            const advantage = attackerAdvantage - defenderAdvantage;
+            winChance += advantage;
+
+            winChance = Math.min(
+                BALANCE.maxWinChance,
+                Math.max(BALANCE.minWinChance, winChance)
+            );
+
+            const attackerWins = Math.random() < winChance;
+            match.winner = attackerWins ? match.attackerId : match.defenderId;
+
+            if (!attackerWins) continue;
+
+            const defenderFaction = this.idToFactionMap.get(match.defenderId);
+
+            const resourceNames = defenderFaction.resources.map(r => r.name);
+
+            const weights = buildResourceWeights(
+                resourceNames,
+                match.targeted_resources,
+                match.protected_resources
+            );
+
+            const chosenName = pickWeightedOne(resourceNames, weights);
+            match.lost_resource = chosenName;
+
+            const resObj = defenderFaction.resources.find(r => r.name === chosenName);
+
+            if (resObj.count > 0) {
+                resObj.count -= 1;
+                match.resourceLossApplied = true;
+            } else {
+                match.resourceLossApplied = false;
+                const scorePenalty = BALANCE.resourceLoss.scorePenaltyIfResourceEmpty;
+                defenderFaction.score -= scorePenalty;
+            }
+        }
+    }
+
+    async narrateCompetition() {
         if (this.phase !== GamePhase.COMPETITION_NARRATE) {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
@@ -265,4 +346,43 @@ function shuffle(array) {
     }
     
     return result;
+}
+
+function pickWeightedOne(keys, weightsByKey) {
+    let total = 0;
+    for (const k of keys) total += (weightsByKey[k] ?? 0);
+
+    if (total <= 0) {
+        return keys[Math.floor(Math.random() * keys.length)];
+    }
+
+    let r = Math.random() * total;
+    for (const k of keys) {
+        r -= (weightsByKey[k] ?? 0);
+        if (r <= 0) return k;
+    }
+    return keys[keys.length - 1];
+}
+
+function buildResourceWeights(resourceNames, targetedResources, protectedResources) {
+    const cfg = BALANCE.resourceLoss;
+    const weights = {};
+
+    for (const name of resourceNames) {
+        weights[name] = cfg.baseWeight;
+    }
+
+    for (const name of (targetedResources ?? [])) {
+        if (weights[name] !== undefined) weights[name] += cfg.targetedBonusWeight;
+    }
+
+    for (const name of (protectedResources ?? [])) {
+        if (weights[name] !== undefined) weights[name] -= cfg.protectedPenaltyWeight;
+    }
+
+    for (const name of resourceNames) {
+        weights[name] = Math.max(cfg.minWeight, weights[name]);
+    }
+
+    return weights;
 }

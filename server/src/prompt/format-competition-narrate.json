@@ -4,7 +4,7 @@
   "title": "CompetitionNarrateBatchOutput",
   "type": "object",
   "additionalProperties": false,
-  "required": ["phase", "results"],
+  "required": ["phase", "results", "context_log"],
   "properties": {
     "phase": { "type": "string", "const": "competition_narrate" },
     "results": {
@@ -13,13 +13,19 @@
       "maxItems": 6,
       "items": { "$ref": "#/$defs/matchNarration" },
       "description": "One narration per match, in the same order as input."
+    },
+    "context_log": {
+      "type": "string",
+      "minLength": 40,
+      "maxLength": 1200,
+      "description": "Batch-level concise log to accumulate and pass into future prompts."
     }
   },
   "$defs": {
     "matchNarration": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["match_id", "display_narrative", "context_logs"],
+      "required": ["match_id", "display_narrative"],
       "properties": {
         "match_id": {
           "type": "string",
@@ -31,13 +37,6 @@
           "minLength": 120,
           "maxLength": 1600,
           "description": "Player-facing narrative reflecting the resolved outcome and given resource changes."
-        },
-        "context_logs": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 6,
-          "items": { "type": "string", "minLength": 20, "maxLength": 220 },
-          "description": "Concise log lines to accumulate and pass into future prompts."
         }
       }
     }
