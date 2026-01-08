@@ -47,15 +47,15 @@ export class Judge {
             .replace("{{ROLE}}", this.ROLE_CONTEXT);
 
         factions = factions.map(({ id, name, rawConcept, rawFlaw }) => ({
-            id,
+            faction_id: id,
             name,
-            rawConcept,
-            rawFlaw
+            raw_concept: rawConcept,
+            raw_flaw: rawFlaw
         }));
 
         const input = {
             phase: "context_setup",
-            context: { rawContextDescription: context.rawContextDescription },
+            context: { raw_context_description: context.rawContextDescription },
             factions: factions
         };
 
@@ -73,18 +73,32 @@ export class Judge {
             .replace("{{RULE}}", this.RULE)
             .replace("{{ROLE}}", this.ROLE_COMPETITION_ANALYZE);
 
+        
+        context = {
+            description: context.description,
+            event_log: context.eventLog
+        }
+
         factions = factions.map(({ id, name, description, resources }) => ({
-            id,
+            faction_id: id,
             name,
             description,
             resources
         }));
 
+        matches = matches.map(({id, attackerId, defenderId, attackDescription, defenseDescription}) => ({
+            match_id: id,
+            attacker_id: attackerId,
+            defender_id: defenderId,
+            attack_description: attackDescription,
+            defense_description: defenseDescription
+        }));
+
         const input = {
             phase: "competition_analyze",
-            context: { description: context.description, event_log: context.event },
-            factions: factions,
-            matches: matches
+            context,
+            factions,
+            matches
         };
 
         const userText = this.USER_MESSAGE_TEMPLATE
@@ -95,8 +109,47 @@ export class Judge {
         return this._parseJson(responseText);
     }
 
-    async narrateCompetition(context, factions) {
+    async narrateCompetition(context, factions, matches) {
+        const developerText = this.DEVELOPER_MESSAGE_TEMPLATE
+            .replace("{{POLICY}}", this.POLICY)
+            .replace("{{RULE}}", this.RULE)
+            .replace("{{ROLE}}", this.ROLE_COMPETITION_NARRATE);
 
+        context = {
+            description: context.description,
+            event_log: context.eventLog
+        }
+
+        factions = factions.map(({ id, name, description, resources }) => ({
+            faction_id: id,
+            name,
+            description,
+            resources
+        }));
+
+        matches = matches.map(({id, attackerId, defenderId, attackDescription, defenseDescription, winnerId, lostResource}) => ({
+            match_id: id,
+            attacker_id: attackerId,
+            defender_id: defenderId,
+            attack_description: attackDescription,
+            defense_description: defenseDescription,
+            winner_id: winnerId,
+            lost_resource: lostResource
+        }));
+
+        const input = {
+            phase: "competition_narrate",
+            context: context,
+            factions: factions,
+            matches: matches
+        };
+
+        const userText = this.USER_MESSAGE_TEMPLATE
+            .replace("{{INPUT}}", JSON.stringify(input))
+            .replace("{{FORMAT}}", this.FORMAT_COMPETITION_NARRATE);
+
+        const responseText = await this._call(developerText, userText, JSON.parse(this.FORMAT_COMPETITION_NARRATE));
+        return this._parseJson(responseText);
     }
 
     async _call(developerText, userText, outputFormat = null) {
@@ -139,7 +192,7 @@ export class Judge {
             throw new Errors.InvalidJudgeResponseError("No valid JSON object found in the response.");
         }
         return text.slice(start, end + 1);
-        }
+    }
 
     _parseJson(text) {
         try {

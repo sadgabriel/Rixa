@@ -4,10 +4,10 @@
   "title": "CompetitionAnalyzeBatchOutput",
   "type": "object",
   "additionalProperties": false,
-  "required": ["phase", "analysisResults"],
+  "required": ["phase", "analysis_results"],
   "properties": {
     "phase": { "type": "string", "const": "competition_analyze" },
-    "analysisResults": {
+    "analysis_results": {
       "type": "array",
       "minItems": 1,
       "maxItems": 6,

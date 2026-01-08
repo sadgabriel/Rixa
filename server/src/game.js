@@ -32,7 +32,7 @@ export class Game {
         this.idToFactionMap = new Map();
         this.idToMatchMap = new Map();
         this.round = 0;
-        this.context = { rawContextDescription: "", description: "", event_log: []};
+        this.context = { rawContextDescription: "", description: "", eventLog: []};
         this.roundOffsets = [];
         this.playerCycle = [];
     }
@@ -252,14 +252,14 @@ export class Game {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        const output = this.#judge.analyzeCompetition(this.context, this.factions, this.matches);
+        const output = await this.#judge.analyzeCompetition(this.context, this.factions, this.matches);
 
-        for (const matchAnalysis of output.analysisResults) {
-            const match = this.idToMatchMap.get(matchAnalysis.id);
+        for (const matchAnalysis of output.analysis_results) {
+            const match = this.idToMatchMap.get(matchAnalysis.match_id);
             match.attackerTags = matchAnalysis.attacker.tags;
             match.defenderTags = matchAnalysis.defender.tags;
-            match.targeted_resources = matchAnalysis.targeted_resources;
-            match.protected_resources = matchAnalysis.protected_resources;
+            match.targetedResources = matchAnalysis.targeted_resources;
+            match.protectedResources = matchAnalysis.protected_resources;
         }
 
         this._calculateCompetition();
@@ -290,7 +290,7 @@ export class Game {
             );
 
             const attackerWins = Math.random() < winChance;
-            match.winner = attackerWins ? match.attackerId : match.defenderId;
+            match.winnerId = attackerWins ? match.attackerId : match.defenderId;
 
             if (!attackerWins) continue;
 
@@ -300,20 +300,18 @@ export class Game {
 
             const weights = buildResourceWeights(
                 resourceNames,
-                match.targeted_resources,
-                match.protected_resources
+                match.targetedResources,
+                match.protectedResources
             );
 
             const chosenName = pickWeightedOne(resourceNames, weights);
-            match.lost_resource = chosenName;
+            match.lostResource = chosenName;
 
             const resObj = defenderFaction.resources.find(r => r.name === chosenName);
 
             if (resObj.count > 0) {
                 resObj.count -= 1;
-                match.resourceLossApplied = true;
             } else {
-                match.resourceLossApplied = false;
                 const scorePenalty = BALANCE.resourceLoss.scorePenaltyIfResourceEmpty;
                 defenderFaction.score -= scorePenalty;
             }
@@ -325,7 +323,14 @@ export class Game {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        // TBD: call judge to narrate competition
+        const output = await this.#judge.narrateCompetition(this.context, this.factions, this.matches);
+
+        this.context.eventLog.push(output.context_log);
+
+        for (const matchNarration of output.results) {
+            const match = this.idToMatchMap.get(matchNarration.match_id);
+            match.displayNarrative = matchNarration.display_narrative;
+        }
 
         if (this.round >= TOTAL_ROUNDS) {
             this.phase = GamePhase.END;

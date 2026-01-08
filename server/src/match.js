@@ -7,10 +7,10 @@ export function createMatch(id) {
         defenseDescription: null,
         attackerTags: [],
         defenderTags: [],
-        targeted_resources: [],
-        protected_resources: [],
-        winner: null,
-        lost_resource: null,
-        resourceLossApplied: null
+        targetedResources: [],
+        protectedResources: [],
+        winnerId: null,
+        lostResource: null,
+        displayNarrative: null
     };
 }
