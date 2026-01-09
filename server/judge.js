@@ -168,12 +168,14 @@ export class Judge {
                 request.previous_response_id = this.previousResponseId;
             }
 
-            if (outputFormat !== null) {
-                request.output_format = {
+            if (outputFormat) {
+                request.text = {
+                    format: {
                     type: "json_schema",
+                    strict: true,
                     schema: outputFormat,
-                    strict: true
-                }
+                    },
+                };
             }
 
             const response = await this.client.responses.create(request);
