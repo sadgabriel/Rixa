@@ -28,7 +28,7 @@ function toContextAndFactionsFromSetup(setup) {
   const context = {
     description: setup.context?.summary ?? "",
     eventLog:
-      "사건 경과: 1) 소송 제기 2) 증거 제출 3) 변론 종결 4) 판결 선고를 앞둔 상태.",
+      [],
   };
 
   const factions = (setup.factions ?? []).map((f) => ({
@@ -61,7 +61,7 @@ describeIntegration("Judge (integration: real OpenAI call)", () => {
   jest.setTimeout(90_000);
 
   test("E2E: setupContext -> analyzeCompetition -> narrateCompetition (single session)", async () => {
-    const judge = new Judge();
+    const judge = new Judge({useState: false, store: false});
     judge.resetSession();
 
     // 1) setupContext

@@ -14,13 +14,18 @@ function loadPrompt(filename) {
 }
 
 export class Judge {
-    constructor() {
+    constructor(options = {}) {
         this.client = new OpenAI({
             apiKey: process.env.OPENAI_API_KEY,
         });
 
-        this.model = "gpt-5-mini";
         this.previousResponseId = null;
+
+        this.options = {
+            model:  options.model ?? "gpt-5-mini",
+            useState: options.useState ?? false,
+            store: options.store ?? false,
+        };
 
         this.POLICY = loadPrompt("policy.txt");
         this.RULE = loadPrompt("rule.txt");
@@ -189,16 +194,16 @@ export class Judge {
     async _callWithFormat(developerText, userText, outputFormat) {
         try {
             const request = {
-                model: this.model,
+                model: this.options.model,
                 reasoning: { effort: "low" },
-                store: true,
+                store: this.options.store,
                 input: [
                     { role: "developer", content: developerText },
                     { role: "user", content: userText },
                 ],
             };
 
-            if (this.previousResponseId !== null) {
+            if (this.options.useState && this.previousResponseId !== null) {
                 request.previous_response_id = this.previousResponseId;
             }
 
@@ -212,8 +217,12 @@ export class Judge {
             };
 
             const response = await this.client.responses.parse(request);
-
-            this.previousResponseId = response.id ?? null;
+            
+            if (this.options.useState) {
+                this.previousResponseId = response.id ?? null;
+            } else {
+                this.previousResponseId = null;
+            }
 
             if (response.output_parsed != null) {
                 return response.output_parsed;
