@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import OpenAI from "openai";
 import "dotenv/config";
-import * as Errors from './errors.js';
+import * as Errors from "./errors.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,21 +50,26 @@ export class Judge {
             faction_id: id,
             name,
             raw_concept: rawConcept,
-            raw_flaw: rawFlaw
+            raw_flaw: rawFlaw,
         }));
 
         const input = {
             phase: "context_setup",
             context: { raw_context_description: context.rawContextDescription },
-            factions: factions
+            factions: factions,
         };
 
         const userText = this.USER_MESSAGE_TEMPLATE
             .replace("{{INPUT}}", JSON.stringify(input))
             .replace("{{FORMAT}}", this.FORMAT_CONTEXT);
 
-        const responseText = await this._call(developerText, userText, JSON.parse(this.FORMAT_CONTEXT));
-        return this._parseJson(responseText);
+        const output = await this._callWithFormat(
+            developerText,
+            userText,
+            JSON.parse(this.FORMAT_CONTEXT)
+        );
+
+        return output;
     }
 
     async analyzeCompetition(context, factions, matches) {
@@ -73,40 +78,50 @@ export class Judge {
             .replace("{{RULE}}", this.RULE)
             .replace("{{ROLE}}", this.ROLE_COMPETITION_ANALYZE);
 
-        
         context = {
             description: context.description,
-            event_log: context.eventLog
-        }
+            event_log: context.eventLog,
+        };
 
         factions = factions.map(({ id, name, description, resources }) => ({
             faction_id: id,
             name,
             description,
-            resources
+            resources,
         }));
 
-        matches = matches.map(({id, attackerId, defenderId, attackDescription, defenseDescription}) => ({
-            match_id: id,
-            attacker_id: attackerId,
-            defender_id: defenderId,
-            attack_description: attackDescription,
-            defense_description: defenseDescription
-        }));
+        matches = matches.map(
+            ({ id, attackerId, defenderId, attackDescription, defenseDescription }) => ({
+                match_id: id,
+                attacker_id: attackerId,
+                defender_id: defenderId,
+                attack_description: attackDescription,
+                defense_description: defenseDescription,
+            })
+        );
 
         const input = {
             phase: "competition_analyze",
             context,
             factions,
-            matches
+            matches,
         };
+
+        const schema = JSON.parse(this.FORMAT_COMPETITION_ANALYZE);
+        schema.properties.analysis_results.minItems = matches.length;
+        schema.properties.analysis_results.maxItems = matches.length;
 
         const userText = this.USER_MESSAGE_TEMPLATE
             .replace("{{INPUT}}", JSON.stringify(input))
-            .replace("{{FORMAT}}", this.FORMAT_COMPETITION_ANALYZE);
+            .replace("{{FORMAT}}", JSON.stringify(schema));
 
-        const responseText = await this._call(developerText, userText, JSON.parse(this.FORMAT_COMPETITION_ANALYZE));
-        return this._parseJson(responseText);
+        const output = await this._callWithFormat(
+            developerText,
+            userText,
+            schema
+        );
+
+        return output;
     }
 
     async narrateCompetition(context, factions, matches) {
@@ -117,42 +132,61 @@ export class Judge {
 
         context = {
             description: context.description,
-            event_log: context.eventLog
-        }
+            event_log: context.eventLog,
+        };
 
         factions = factions.map(({ id, name, description, resources }) => ({
             faction_id: id,
             name,
             description,
-            resources
+            resources,
         }));
 
-        matches = matches.map(({id, attackerId, defenderId, attackDescription, defenseDescription, winnerId, lostResource}) => ({
-            match_id: id,
-            attacker_id: attackerId,
-            defender_id: defenderId,
-            attack_description: attackDescription,
-            defense_description: defenseDescription,
-            winner_id: winnerId,
-            lost_resource: lostResource
-        }));
+        matches = matches.map(
+            ({
+                id,
+                attackerId,
+                defenderId,
+                attackDescription,
+                defenseDescription,
+                winnerId,
+                lostResource,
+            }) => ({
+                match_id: id,
+                attacker_id: attackerId,
+                defender_id: defenderId,
+                attack_description: attackDescription,
+                defense_description: defenseDescription,
+                winner_id: winnerId,
+                lost_resource: lostResource,
+            })
+        );
 
         const input = {
             phase: "competition_narrate",
             context: context,
             factions: factions,
-            matches: matches
+            matches: matches,
         };
+
+        const schema = JSON.parse(this.FORMAT_COMPETITION_NARRATE);
+        schema.properties.results.minItems = matches.length;
+        schema.properties.results.maxItems = matches.length;
 
         const userText = this.USER_MESSAGE_TEMPLATE
             .replace("{{INPUT}}", JSON.stringify(input))
-            .replace("{{FORMAT}}", this.FORMAT_COMPETITION_NARRATE);
+            .replace("{{FORMAT}}", JSON.stringify(schema));
 
-        const responseText = await this._call(developerText, userText, JSON.parse(this.FORMAT_COMPETITION_NARRATE));
-        return this._parseJson(responseText);
+        const output = await this._callWithFormat(
+            developerText,
+            userText,
+            schema
+        );
+
+        return output;
     }
 
-    async _call(developerText, userText, outputFormat = null) {
+    async _callWithFormat(developerText, userText, outputFormat) {
         try {
             const request = {
                 model: this.model,
@@ -168,44 +202,32 @@ export class Judge {
                 request.previous_response_id = this.previousResponseId;
             }
 
-            if (outputFormat) {
-                request.text = {
-                    format: {
+            request.text = {
+                format: {
                     type: "json_schema",
+                    name: outputFormat.title ?? "structured_output",
                     strict: true,
                     schema: outputFormat,
-                    },
-                };
-            }
+                },
+            };
 
-            const response = await this.client.responses.create(request);
+            const response = await this.client.responses.parse(request);
 
             this.previousResponseId = response.id ?? null;
-            return response.output_text ?? "";
-        } catch (error) {
-            throw new Errors.JudgeCallError(error.message);
-        }
-    }
 
-    _extractFirstJsonObject(text) {
-        const start = text.indexOf("{");
-        const end = text.lastIndexOf("}");
-        if (start === -1 || end === -1 || end <= start) {
-            throw new Errors.InvalidJudgeResponseError("No valid JSON object found in the response.");
-        }
-        return text.slice(start, end + 1);
-    }
+            if (response.output_parsed != null) {
+                return response.output_parsed;
+            }
 
-    _parseJson(text) {
-        try {
-            const jsonText = this._extractFirstJsonObject(text);
-            return JSON.parse(jsonText);
+            const snippet = (response.output_text ?? "").slice(0, 300);
+            throw new Errors.InvalidJudgeResponseError(
+                `No output_parsed (parse). output_text snippet: ${JSON.stringify(snippet)}`
+            );
         } catch (error) {
             if (error instanceof Errors.InvalidJudgeResponseError) {
                 throw error;
-            } else {
-                throw new Errors.InvalidJudgeResponseError(error.message);
             }
+            throw new Errors.JudgeCallError(error.message);
         }
     }
 }

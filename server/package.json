@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "keywords": [],
   "author": "MintGhost",
@@ -18,6 +18,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "jest": "^30.2.0"
   }
 }
