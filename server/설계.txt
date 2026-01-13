@@ -1,43 +1,26 @@
+프로토콜을 만들어야 한다.
+
 {
-  "phase": "context_setup",
-  "context" : {
-    raw_context_description: "string"
-  }
-  "factions": [
-    {
-      "id": "fac_01",
-      "name": "string",
-      "rawConcept": "string",
-      "RawFlaw": "string"
+    "type": string,
+    "data": {}
+}
+
+가장 기본적인 형태다. type에 뭐가 올 수 있는지, 그리고 그 경운 페이로드의 구조가 어떠한지를 정해야 한다.
+
+일단 로비 관련을 만들자.
+
+{
+    "type": "lobby.create_game",
+    "data": {
+        "game_name": string,
+        "player_name": string
     }
-  ]
 }
 
 {
-  "phase": "competition_analyze",
-  "context" : {
-    description: "string"
-    event_log: "string"
-  }
-  "factions": [
-    {
-      "id": "fac_01",
-      "name": "string",
-      "description": "string",
-      "resources": {
-        "name": "string",
-        "description": "string",
-        "count": "number"
-      }
+    "type": "lobby.join_game",
+    "data": {
+        "game_id": string,
+        "player_name": string
     }
-  ],
-  "matches": [
-    {
-      "attackerId": "string",
-      "defenderId": "string",
-      "attackDescription": "string",
-      "defenseDescription": "string"
-    }
-  ]
 }
-

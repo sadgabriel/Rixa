@@ -22,11 +22,9 @@ const TOTAL_ROUNDS = 6;
 const MAX_RESOURCE = 3;
 
 export class Game {
-    #id;
-    #judge;
-    constructor(judge) {
-        this.#id = uuidv4();
-        this.#judge = judge;
+    constructor(judge, name = "new game") {
+        this.id = uuidv4();
+        this.judge = judge;
         this.phase = GamePhase.LOBBY;
         this.idToPlayerMap = new Map();
         this.idToFactionMap = new Map();
@@ -35,10 +33,6 @@ export class Game {
         this.context = { rawContextDescription: "", description: "", eventLog: []};
         this.roundOffsets = [];
         this.playerCycle = [];
-    }
-
-    get id() {
-        return this.#id;
     }
 
     get players() {
@@ -161,7 +155,7 @@ export class Game {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        const output = await this.#judge.setupContext(this.context, this.factions);
+        const output = await this.judge.setupContext(this.context, this.factions);
 
         this.context.description = output.context.summary;
         for (const factionResult of output.factions) {
@@ -252,7 +246,7 @@ export class Game {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        const output = await this.#judge.analyzeCompetition(this.context, this.factions, this.matches);
+        const output = await this.judge.analyzeCompetition(this.context, this.factions, this.matches);
 
         for (const matchAnalysis of output.analysis_results) {
             const match = this.idToMatchMap.get(matchAnalysis.match_id);
@@ -323,7 +317,7 @@ export class Game {
             throw new Errors.InvalidGamePhaseError(this.phase);
         }
 
-        const output = await this.#judge.narrateCompetition(this.context, this.factions, this.matches);
+        const output = await this.judge.narrateCompetition(this.context, this.factions, this.matches);
 
         this.context.eventLog.push(output.context_log);
 

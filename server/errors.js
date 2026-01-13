@@ -100,3 +100,32 @@ export class InvalidJudgeResponseError extends Error {
     }
 }
 
+export class GameNotFoundError extends Error {
+    constructor(gameId) {
+        super(`Game not Found: ${gameId}`);
+        this.name = "GameNotFoundError";
+    }
+}
+
+export class PlayerNotFoundError extends Error {
+    constructor(playerId) {
+        super(`Player not Found: ${playerId}`);
+        this.name = "PlayerNotFoundError";
+    }
+}
+
+export class NotInGameError extends Error {
+    constructor(clientId) {
+        super(`Not in game: ${clientId}`);
+        this.name = "NotInGameError";
+    }
+}
+
+export class AlreadyInGameError extends Error {
+    constructor(gameId) {
+        super(`Already in game: ${gameId}`);
+        this.name = "AlreadyInGameError";
+    }
+}
+
+
