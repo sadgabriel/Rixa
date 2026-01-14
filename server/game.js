@@ -25,6 +25,7 @@ export class Game {
     constructor(judge, name = "new game") {
         this.id = uuidv4();
         this.judge = judge;
+        this.name = name;
         this.phase = GamePhase.LOBBY;
         this.idToPlayerMap = new Map();
         this.idToFactionMap = new Map();
@@ -33,6 +34,12 @@ export class Game {
         this.context = { rawContextDescription: "", description: "", eventLog: []};
         this.roundOffsets = [];
         this.playerCycle = [];
+    }
+
+    _checkPhase(required) {
+        if (this.phase !== required) {
+            throw new Errors.InvalidGamePhaseError(this.phase);
+        }
     }
 
     get players() {
@@ -47,18 +54,49 @@ export class Game {
         return Array.from(this.idToMatchMap.values());
     }
 
-    findFactionByPlayerId(playerId) {
+    getPlayer(playerId) {
         const player = this.idToPlayerMap.get(playerId);
-        const faction = this.idToFactionMap.get(player.factionId);
+        if (!player) {
+            throw new Errors.PlayerNotFoundError(playerId);
+        }
+        return player;
+    }
+
+    getFaction(factionId) {
+        const faction = this.idToFactionMap.get(factionId);
+        if (!faction) {
+            throw new Errors.FactionNotFoundError(factionId);
+        }
         return faction;
     }
 
-    findMatchByAttacker(attackerId) {
-        return this.matches.find(match => match.attackerId === attackerId);
+    getMatch(matchId) {
+        const match = this.idToMatchMap.get(matchId);
+        if (!match) {
+            throw new Errors.MatchNotFoundError(matchId);
+        }
+        return match;
     }
 
-    findMatchByDefender(defenderId) {
-        return this.matches.find(match => match.defenderId === defenderId);
+    getFactionByPlayerId(playerId) {
+        const player = this.getPlayer(playerId);
+        return this.getFaction(player.factionId);
+    }
+
+    getMatchByAttacker(attackerId) {
+        const match = this.matches.find(match => match.attackerId === attackerId);
+        if (!match) {
+            throw new Errors.MatchNotFoundError(attackerId);
+        }
+        return match;
+    }
+
+    getMatchByDefender(defenderId) {
+        const match = this.matches.find(match => match.defenderId === defenderId);
+        if (!match) {
+            throw new Errors.MatchNotFoundError(defenderId);
+        }
+        return match;
     }
 
     findPlayerByFactionId(factionId) {
@@ -66,9 +104,7 @@ export class Game {
     }
 
     addPlayer(name) {
-        if (this.phase !== GamePhase.LOBBY) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.LOBBY);
 
         const player = createPlayer(name);
         this.idToPlayerMap.set(player.id, player);
@@ -76,22 +112,38 @@ export class Game {
     }
 
     removePlayer(playerId) {
-        if (this.phase !== GamePhase.LOBBY) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.LOBBY);
 
         this.idToPlayerMap.delete(playerId);
     }
 
-    gameStart() {
-        if (this.phase !== GamePhase.LOBBY) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
+    setReady(playerId, ready = true) {
+        this._checkPhase(GamePhase.LOBBY);
+
+        const player = this.getPlayer(playerId);
+        player.ready = ready;
+
+        if (this.players.every(p => p.ready)){
+            this.gameStart();
         }
+    }
+
+    gameStart() {
+        this._checkPhase(GamePhase.LOBBY);
+
         if (this.players.length < 2) {
             throw new Errors.NotEnoughPlayersError(this.players.length);
         }
 
+        if (!this.players.every(p => p.ready)){
+            throw new Errors.PlayersNotReadyError();
+        }
+
+        this.round = 1;
         this._createFactions();
+        this.playerCycle = shuffle(this.players);
+        this._generateRoundOffsets();
+        this._createMatches();
 
         this.phase = GamePhase.CONTEXT_INPUT;
     }
@@ -107,23 +159,16 @@ export class Game {
     }
 
     setRawContext(rawContextDescription) {
-        if (this.phase !== GamePhase.CONTEXT_INPUT) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.CONTEXT_INPUT);
 
         this.context.rawContextDescription = rawContextDescription;
         this.phase = GamePhase.FACTION_CONCEPT_INPUT;
     }
 
     setRawFactionConceptAndName(factionId, rawConceptDescription, name) {
-        if (this.phase !== GamePhase.FACTION_CONCEPT_INPUT) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.FACTION_CONCEPT_INPUT);
 
-        const faction = this.idToFactionMap.get(factionId);
-        if (!faction) {
-            throw new Errors.FactionNotFoundError(factionId);
-        }
+        const faction = this.getFaction(factionId);
 
         faction.rawConcept = rawConceptDescription;
         faction.name = name;
@@ -134,14 +179,9 @@ export class Game {
     }
 
     setRawFactionFlaw(factionId, rawFlawDescription) {
-        if (this.phase !== GamePhase.FACTION_FLAW_INPUT) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.FACTION_FLAW_INPUT);
 
-        const faction = this.idToFactionMap.get(factionId);
-        if (!faction) {
-            throw new Errors.FactionNotFoundError(factionId);
-        }
+        const faction = this.getFaction(factionId);
 
         faction.rawFlaw = rawFlawDescription;
 
@@ -151,29 +191,20 @@ export class Game {
     }
 
     async setupContext() {
-        if (this.phase !== GamePhase.CONTEXT_SETUP) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.CONTEXT_SETUP);
 
         const output = await this.judge.setupContext(this.context, this.factions);
 
         this.context.description = output.context.summary;
         for (const factionResult of output.factions) {
-            const faction = this.idToFactionMap.get(factionResult.id);
-            if (faction) {
-                faction.description = factionResult.summary;
-                faction.resources = factionResult.resources;
-                for (const resource of faction.resources) {
-                    resource.count = MAX_RESOURCE;
-                }
+            const faction = this.getFaction(factionResult.id);
+            faction.description = factionResult.summary;
+            faction.resources = factionResult.resources;
+            for (const resource of faction.resources) {
+                resource.count = MAX_RESOURCE;
             }
         }
 
-        this.round = 1;
-
-        this.playerCycle = shuffle(this.players);
-        this._generateRoundOffsets();
-        this._createMatches();
         this.phase = GamePhase.ATTACK;
     }
 
@@ -186,7 +217,7 @@ export class Game {
         }
         
         this.roundOffsets = [];
-        for (let round = 0; round < 6; round++) {
+        for (let round = 0; round < TOTAL_ROUNDS; round++) {
             this.roundOffsets.push(offsets[round % offsets.length]);
         }
     }
@@ -199,25 +230,20 @@ export class Game {
         this.idToMatchMap = new Map();
         let index = 1;
         for (let i = 0; i < n; i++) {
-            const matchId = `m_${String(index++).padStart(2, '0')}`
+            const matchId = `m_${String(index++).padStart(2, '0')}`;
             const match = createMatch(matchId);
 
-            match.attackerId = this.findFactionByPlayerId(playerIds[i]).id;
-            match.defenderId = this.findFactionByPlayerId(playerIds[(i + offset) % n]).id;
+            match.attackerId = this.getFactionByPlayerId(playerIds[i]).id;
+            match.defenderId = this.getFactionByPlayerId(playerIds[(i + offset) % n]).id;
             
             this.idToMatchMap.set(match.id, match);
         }
     }
 
     submitAttack(attackerId, attackDescription) {
-        if (this.phase !== GamePhase.ATTACK) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.ATTACK);
 
-        const match = this.findMatchByAttacker(attackerId);
-        if (!match) {
-            throw new Errors.MatchNotFoundError(attackerId);
-        }
+        const match = this.getMatchByAttacker(attackerId);
         match.attackDescription = attackDescription;
 
         if (this.matches.every(m => m.attackDescription !== null)) {
@@ -226,14 +252,9 @@ export class Game {
     }
 
     submitDefense(defenderId, defenseDescription) {
-        if (this.phase !== GamePhase.DEFENSE) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.DEFENSE);
 
-        const match = this.findMatchByDefender(defenderId);
-        if (!match) {
-            throw new Errors.MatchNotFoundError(defenderId);
-        }
+        const match = this.getMatchByDefender(defenderId);
         match.defenseDescription = defenseDescription;
 
         if (this.matches.every(m => m.defenseDescription !== null)) {
@@ -242,14 +263,12 @@ export class Game {
     }
 
     async analyzeCompetition() {
-        if (this.phase !== GamePhase.COMPETITION_ANALYZE) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.COMPETITION_ANALYZE);
 
         const output = await this.judge.analyzeCompetition(this.context, this.factions, this.matches);
 
         for (const matchAnalysis of output.analysis_results) {
-            const match = this.idToMatchMap.get(matchAnalysis.match_id);
+            const match = this.getMatch(matchAnalysis.match_id);
             match.attackerTags = matchAnalysis.attacker.tags;
             match.defenderTags = matchAnalysis.defender.tags;
             match.targetedResources = matchAnalysis.targeted_resources;
@@ -288,7 +307,7 @@ export class Game {
 
             if (!attackerWins) continue;
 
-            const defenderFaction = this.idToFactionMap.get(match.defenderId);
+            const defenderFaction = this.getFaction(match.defenderId);
 
             const resourceNames = defenderFaction.resources.map(r => r.name);
 
@@ -313,16 +332,14 @@ export class Game {
     }
 
     async narrateCompetition() {
-        if (this.phase !== GamePhase.COMPETITION_NARRATE) {
-            throw new Errors.InvalidGamePhaseError(this.phase);
-        }
+        this._checkPhase(GamePhase.COMPETITION_NARRATE);
 
         const output = await this.judge.narrateCompetition(this.context, this.factions, this.matches);
 
         this.context.eventLog.push(output.context_log);
 
         for (const matchNarration of output.results) {
-            const match = this.idToMatchMap.get(matchNarration.match_id);
+            const match = this.getMatch(matchNarration.match_id);
             match.displayNarrative = matchNarration.display_narrative;
         }
 
@@ -333,6 +350,10 @@ export class Game {
             this._createMatches();
             this.phase = GamePhase.ATTACK;
         }
+    }
+
+    restart() {
+        // TBD
     }
 }
 

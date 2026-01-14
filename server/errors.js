@@ -80,6 +80,12 @@ export class NotEnoughPlayersError extends AppError {
   }
 }
 
+export class PlayersNotReadyError extends AppError {
+  constructor(gameId) {
+    super("PLAYER_NOT_READY", `Not all players ready for the game.`);
+  }
+}
+
 export class FactionNotFoundError extends AppError {
   constructor(factionId) {
     super("FACTION_NOT_FOUND", `Faction with ID ${factionId} not found.`);

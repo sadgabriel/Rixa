@@ -89,7 +89,7 @@ function handleLobbyCreateGame(client, data) {
 function handleLobbyJoinGame(client, data) {
     const game = idToGameMap.get(data.game_id);
     if (game != null) {
-        joinGame(client, game, data.player_name)
+        joinGame(client, game, data.player_name);
         broadcastLobbyState();
     } else {
         throw new Errors.GameNotFoundError(data.game_id);
@@ -97,7 +97,7 @@ function handleLobbyJoinGame(client, data) {
 }
 
 function handleLobbyState(client, data) {
-    client.sendMessage("lobby.state", formLobbyState())
+    client.sendMessage("lobby.state", formLobbyState());
 }
 
 function handleGameLeave(client, data) {
@@ -114,11 +114,34 @@ function handleGameLeave(client, data) {
 }
 
 function handleGameState(client, data) {
-
+    if (client.gameId !== null) {
+        const game = idToGameMap.get(client.gameId);
+        client.sendMessage("game.state", formGameState(game));
+    } else {
+        throw new Errors.NotInGameError(client.id);
+    }
 }
 
 function handleGameSubmit(client, data) {
+    const kind = data.kind;
+    const payload = data.payload;
+    
+    if (client.gameId == null) {
+        throw new Errors.NotInGameError(client.id);
+    }
 
+    const game = idToGameMap.get(client.gameId);
+
+    if (game == null) {
+        throw new Errors.GameNotFoundError(client.gameId);
+    }
+
+    switch (kind) {
+        case "ready":
+            break;
+        case "unready":
+            break;
+    }
 }
 
 function createGame(gameName){
@@ -158,6 +181,18 @@ function formLobbyState() {
     }
     return {
         games
+    }
+}
+
+function formGameState(game) {
+    return {
+        game_id: game.id,
+        phase: game.phase,
+        round: game.round,
+        context: game.context,
+        players: game.players,
+        factions: game.factions,
+        matches: game.matches
     }
 }
 

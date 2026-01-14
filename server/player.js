@@ -5,5 +5,6 @@ export function createPlayer(name) {
         id: uuidv4(),
         name: name,
         factionId: null,
+        ready: false
     };
 }
