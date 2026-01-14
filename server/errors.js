@@ -1,131 +1,135 @@
-export class PlayerExistsError extends Error {
-    constructor(playerId) {
-        super(`Player with ID ${playerId} already exists.`);
-        this.name = 'PlayerExistsError';
-        this.playerId = playerId;
+class AppError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = this.constructor.name;
+    this.code = code;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
     }
+  }
 }
 
-export class PlayerNameTakenError extends Error {
-    constructor(name) {
-        super(`Player name "${name}" is already taken.`);
-        this.name = 'PlayerNameTakenError';
-        this.playerName = name;
-    }
+export class BadMessageError extends AppError {
+  constructor(message = "Invalid message format.") {
+    super("BAD_MESSAGE", message);
+  }
 }
 
-export class InvalidGamePhaseError extends Error {
-    constructor(phase) {
-        super(`Invalid game phase: ${phase}.`);
-        this.name = 'InvalidGamePhaseError';
-        this.phase = phase;
-    }
+export class UnknownTypeError extends AppError {
+  constructor(type) {
+    super("UNKNOWN_TYPE", `Unknown message type: ${type}`);
+    this.type = type;
+  }
 }
 
-export class NotEnoughPlayersError extends Error {
-    constructor(count) {
-        super(`Not enough players to start the game. Current: ${count}, Required: 2.`);
-        this.name = 'NotEnoughPlayersError';
-        this.count = count;
-    }
+export class GameNotFoundError extends AppError {
+  constructor(gameId) {
+    super("GAME_NOT_FOUND", `Game not found: ${gameId}`);
+    this.gameId = gameId;
+  }
 }
 
-export class PlayerNotFoundError extends Error {
-    constructor(playerId) {
-        super(`Player with ID ${playerId} not found.`);
-        this.name = 'PlayerNotFoundError';
-        this.playerId = playerId;
-    }
+export class NotInGameError extends AppError {
+  constructor(clientId) {
+    super("NOT_IN_GAME", `Client is not in a game: ${clientId}`);
+    this.clientId = clientId;
+  }
 }
 
-export class FactionNotFoundError extends Error {
-    constructor(factionId) {
-        super(`Faction with ID ${factionId} not found.`);
-        this.name = 'FactionNotFoundError';
-        this.factionId = factionId;
-    }
+export class AlreadyInGameError extends AppError {
+  constructor(gameId) {
+    super("ALREADY_IN_GAME", `Client is already in a game: ${gameId}`);
+    this.gameId = gameId;
+  }
 }
 
-export class MatchNotFoundError extends Error {
-    constructor(playerId) {
-        super(`Match for player ID ${playerId} not found.`);
-        this.name = 'MatchNotFoundError';
-        this.playerId = playerId;
-    }
+export class PlayerExistsError extends AppError {
+  constructor(playerId) {
+    super("PLAYER_EXISTS", `Player with ID ${playerId} already exists.`);
+    this.playerId = playerId;
+  }
 }
 
-export class FactionAlreadySetError extends Error {
-    constructor(playerId) {
-        super(`Player with ID ${playerId} has already set their faction.`);
-        this.name = 'FactionAlreadySetError';
-        this.playerId = playerId;
-    }
+export class PlayerNotFoundError extends AppError {
+  constructor(playerId) {
+    super("PLAYER_NOT_FOUND", `Player with ID ${playerId} not found.`);
+    this.playerId = playerId;
+  }
 }
 
-export class TooManyAttacksError extends Error {
-    constructor(playerId) {
-        super(`Player with ID ${playerId} has too many attacks.`);
-        this.name = 'TooManyAttacksError';
-        this.playerId = playerId;
-    }
+export class PlayerNameTakenError extends AppError {
+  constructor(playerName) {
+    super("PLAYER_NAME_TAKEN", `Player name "${playerName}" is already taken.`);
+    this.playerName = playerName;
+  }
 }
 
-export class TooManyDefensesError extends Error {
-    constructor(playerId) {
-        super(`Player with ID ${playerId} has too many defenses.`);
-        this.name = 'TooManyDefensesError';
-        this.playerId = playerId;
-    }
+export class InvalidGamePhaseError extends AppError {
+  constructor(phase) {
+    super("INVALID_GAME_PHASE", `Invalid game phase: ${phase}.`);
+    this.phase = phase;
+  }
 }
 
-export class SocketNotOpenError extends Error {
-    constructor(clientId) {
-        super(`Socket for client ID ${clientId} is not open.`);
-        this.name = 'SocketNotOpenError';
-        this.clientId = clientId;
-    }
+export class NotEnoughPlayersError extends AppError {
+  constructor(count, required = 2) {
+    super("NOT_ENOUGH_PLAYERS", `Not enough players to start the game. Current: ${count}, Required: ${required}.`);
+    this.count = count;
+    this.required = required;
+  }
 }
 
-export class JudgeCallError extends Error {
-    constructor(message) {
-        super(`Judge call failed: ${message}`);
-        this.name = 'JudgeCallError';
-    }
+export class FactionNotFoundError extends AppError {
+  constructor(factionId) {
+    super("FACTION_NOT_FOUND", `Faction with ID ${factionId} not found.`);
+    this.factionId = factionId;
+  }
 }
 
-export class InvalidJudgeResponseError extends Error {
-    constructor(message) {
-        super(`Invalid judge response: ${message}`);
-        this.name = 'InvalidJudgeResponseError';
-    }
+export class MatchNotFoundError extends AppError {
+  constructor(playerId) {
+    super("MATCH_NOT_FOUND", `Match for player ID ${playerId} not found.`);
+    this.playerId = playerId;
+  }
 }
 
-export class GameNotFoundError extends Error {
-    constructor(gameId) {
-        super(`Game not Found: ${gameId}`);
-        this.name = "GameNotFoundError";
-    }
+export class FactionAlreadySetError extends AppError {
+  constructor(playerId) {
+    super("FACTION_ALREADY_SET", `Player with ID ${playerId} has already set their faction.`);
+    this.playerId = playerId;
+  }
 }
 
-export class PlayerNotFoundError extends Error {
-    constructor(playerId) {
-        super(`Player not Found: ${playerId}`);
-        this.name = "PlayerNotFoundError";
-    }
+export class TooManyAttacksError extends AppError {
+  constructor(playerId) {
+    super("TOO_MANY_ATTACKS", `Player with ID ${playerId} has too many attacks.`);
+    this.playerId = playerId;
+  }
 }
 
-export class NotInGameError extends Error {
-    constructor(clientId) {
-        super(`Not in game: ${clientId}`);
-        this.name = "NotInGameError";
-    }
+export class TooManyDefensesError extends AppError {
+  constructor(playerId) {
+    super("TOO_MANY_DEFENSES", `Player with ID ${playerId} has too many defenses.`);
+    this.playerId = playerId;
+  }
 }
 
-export class AlreadyInGameError extends Error {
-    constructor(gameId) {
-        super(`Already in game: ${gameId}`);
-        this.name = "AlreadyInGameError";
-    }
+export class SocketNotOpenError extends AppError {
+  constructor(clientId) {
+    super("SOCKET_NOT_OPEN", `Socket for client ID ${clientId} is not open.`);
+    this.clientId = clientId;
+  }
 }
 
+export class JudgeCallError extends AppError {
+  constructor(message = "Judge call failed.") {
+    super("JUDGE_CALL_FAILED", message);
+  }
+}
 
+export class InvalidJudgeResponseError extends AppError {
+  constructor(message = "Invalid judge response.") {
+    super("INVALID_JUDGE_RESPONSE", message);
+  }
+}

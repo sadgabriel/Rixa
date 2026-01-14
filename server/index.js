@@ -17,36 +17,36 @@ wss.on('connection', (ws) => {
     socketToClientMap.set(ws, client);
 
     ws.on('message', (message) => {
-        message = JSON.parse(message);
-        const type = message.type;
-        const data = message.data;
         const client = socketToClientMap.get(ws);
 
-        switch (type) {
-            case "lobby.create_game":
-                const game = createGame(data.game_name);
-                joinGame(client, game, data.player_name);
-                broadcastLobbyState();
-                break;
-            case "lobby.join_game":
-                game = idToGameMap.get(data.game_id);
-                if (game !== null) {                             
-                    joinGame(client, game, data.player_name)
-                    broadcastLobbyState();
-                } else {
-                    // Error
-                }
-                break;
-            case "lobby.state":
-                client.sendMessage("lobby.state", formLobbyState())
-                break;
-            case "game.leave":
-                break;
-            case "game.state":
-                
-                break;
-            case "game.submit":
-                break;
+        try {
+            const [type, data] = parseJson(message);
+
+            switch (type) {
+                case "lobby.create_game":
+                    handleLobbyCreateGame(client, data);
+                    break;
+                case "lobby.join_game":
+                    handleLobbyJoinGame(client, data);
+                    break;
+                case "lobby.state":
+                    handleLobbyState(client, data);
+                    break;
+                case "game.leave":
+                    handleGameLeave(client, data);
+                    break;
+                case "game.state":
+                    handleGameState(client, data);
+                    break;
+                case "game.submit":
+                    handleGameSubmit(client, data);
+                    break;
+            }
+        } catch (error) {
+            client.sendMessage("error", {
+                code: error?.code ?? "INTERNAL",
+                message: error?.message ?? "Internal error."
+            })
         }
     })
 
@@ -67,6 +67,58 @@ function findClientByPlayerId(playerId){
         }
     }
     throw new Errors.PlayerNotFoundError(playerId);
+}
+
+function parseJson(message) {
+    let obj;
+    try {
+        const text = typeof message === "string" ? message : message.toString("utf-8");
+        obj = JSON.parse(text);
+    } catch {
+        throw new Errors.BadMessageError();
+    }
+    return [obj.type, obj.data];
+}
+
+function handleLobbyCreateGame(client, data) {
+    const game = createGame(data.game_name);
+    joinGame(client, game, data.player_name);
+    broadcastLobbyState();
+}
+
+function handleLobbyJoinGame(client, data) {
+    const game = idToGameMap.get(data.game_id);
+    if (game != null) {
+        joinGame(client, game, data.player_name)
+        broadcastLobbyState();
+    } else {
+        throw new Errors.GameNotFoundError(data.game_id);
+    }
+}
+
+function handleLobbyState(client, data) {
+    client.sendMessage("lobby.state", formLobbyState())
+}
+
+function handleGameLeave(client, data) {
+    if (client.gameId !== null) {
+        const game = idToGameMap.get(client.gameId);
+        if (game == null) throw new Errors.GameNotFoundError(client.gameId);
+
+        game.removePlayer(client.playerId);
+        client.gameId = null;
+        client.playerId = null;
+    } else {
+        throw new Errors.NotInGameError(client.id);
+    }
+}
+
+function handleGameState(client, data) {
+
+}
+
+function handleGameSubmit(client, data) {
+
 }
 
 function createGame(gameName){
