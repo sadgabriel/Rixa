@@ -99,10 +99,6 @@ export class Game {
         return match;
     }
 
-    findPlayerByFactionId(factionId) {
-        return this.players.find(player => player.factionId === factionId);
-    }
-
     addPlayer(name) {
         this._checkPhase(GamePhase.LOBBY);
 
@@ -158,17 +154,25 @@ export class Game {
         }
     }
 
-    setRawContext(rawContextDescription) {
+    submitContext(rawContextDescription) {
         this._checkPhase(GamePhase.CONTEXT_INPUT);
+
+        if (this.context.rawContextDescription !== null){
+            throw new Errors.AlreadySubmittedError();
+        }
 
         this.context.rawContextDescription = rawContextDescription;
         this.phase = GamePhase.FACTION_CONCEPT_INPUT;
     }
 
-    setRawFactionConceptAndName(factionId, rawConceptDescription, name) {
+    submitFactionConceptAndName(factionId, rawConceptDescription, name) {
         this._checkPhase(GamePhase.FACTION_CONCEPT_INPUT);
 
         const faction = this.getFaction(factionId);
+
+        if (faction.rawConcept !== null){
+            throw new Errors.AlreadySubmittedError();
+        }
 
         faction.rawConcept = rawConceptDescription;
         faction.name = name;
@@ -178,10 +182,14 @@ export class Game {
         }
     }
 
-    setRawFactionFlaw(factionId, rawFlawDescription) {
+    submitFactionFlaw(factionId, rawFlawDescription) {
         this._checkPhase(GamePhase.FACTION_FLAW_INPUT);
 
         const faction = this.getFaction(factionId);
+
+        if (faction.rawFlaw !== null){
+            throw new Errors.AlreadySubmittedError();
+        }
 
         faction.rawFlaw = rawFlawDescription;
 
@@ -244,6 +252,11 @@ export class Game {
         this._checkPhase(GamePhase.ATTACK);
 
         const match = this.getMatchByAttacker(attackerId);
+
+        if (match.attackDescription !== null){
+            throw new Errors.AlreadySubmittedError();
+        }
+
         match.attackDescription = attackDescription;
 
         if (this.matches.every(m => m.attackDescription !== null)) {
@@ -255,6 +268,11 @@ export class Game {
         this._checkPhase(GamePhase.DEFENSE);
 
         const match = this.getMatchByDefender(defenderId);
+
+        if (match.defenseDescription !== null){
+            throw new Errors.AlreadySubmittedError();
+        }
+
         match.defenseDescription = defenseDescription;
 
         if (this.matches.every(m => m.defenseDescription !== null)) {
