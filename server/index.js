@@ -16,6 +16,11 @@ wss.on('connection', (ws) => {
     idToClientMap.set(client.id, client);
     socketToClientMap.set(ws, client);
 
+    client.sendMessage("welcome", {
+        client_id: client.id,
+        lobby_state: formLobbyState()
+    })
+
     ws.on('message', async (message) => {
         const client = socketToClientMap.get(ws);
 
