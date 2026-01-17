@@ -1,4 +1,5 @@
-using System.Data.Common;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 public class LobbyGameInfo
 {
