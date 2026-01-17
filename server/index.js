@@ -209,7 +209,7 @@ function formLobbyState() {
             id: game.id,
             name: game.name,
             state: game.phase === GamePhase.LOBBY ? "waiting": "playing",
-            player_count: game.players.length
+            playerCount: game.players.length
         })
     }
     return {
@@ -219,7 +219,7 @@ function formLobbyState() {
 
 function formGameState(game) {
     return {
-        game_id: game.id,
+        id: game.id,
         phase: game.phase,
         round: game.round,
         context: game.context,
@@ -245,8 +245,7 @@ function broadcastToGame(game, type, data) {
 }
 
 function broadcastLobbyState() {
-    const data = formLobbyState();
-    broadcast("lobby.state", data);
+    broadcast("lobby.state", formLobbyState());
 }
 
 function broadcastGameState(game) {

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createPlayer } from './player.js';
 import { createFaction } from './faction.js';
 import { createMatch } from './match.js';
+import { createContext } from '.context.js';
 import { BALANCE } from './balanceConfig.js';
 import * as Errors from './errors.js';
 
@@ -31,7 +32,7 @@ export class Game {
         this.idToFactionMap = new Map();
         this.idToMatchMap = new Map();
         this.round = 0;
-        this.context = { rawContextDescription: "", description: "", eventLog: []};
+        this.context = createContext();
         this.roundOffsets = [];
         this.playerCycle = [];
     }
