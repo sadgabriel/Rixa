@@ -17,8 +17,8 @@ wss.on('connection', (ws) => {
     socketToClientMap.set(ws, client);
 
     client.sendMessage("welcome", {
-        client_id: client.id,
-        lobby_state: formLobbyState()
+        clientState: formClientState(client),
+        lobbyState: formLobbyState()
     })
 
     ws.on('message', async (message) => {
@@ -28,10 +28,13 @@ wss.on('connection', (ws) => {
             const [type, data] = parseJson(message);
 
             switch (type) {
-                case "lobby.create_game":
+                case "client.state":
+                    handleClientState(client, data);
+                    break;
+                case "lobby.createGame":
                     handleLobbyCreateGame(client, data);
                     break;
-                case "lobby.join_game":
+                case "lobby.joinGame":
                     handleLobbyJoinGame(client, data);
                     break;
                 case "lobby.state":
@@ -85,19 +88,25 @@ function parseJson(message) {
     return [obj.type, obj.data];
 }
 
+function handleClientState(client, data){
+    client.sendMessage("client.state", formClientState(client));
+}
+
 function handleLobbyCreateGame(client, data) {
-    const game = createGame(data.game_name);
-    joinGame(client, game, data.player_name);
+    const game = createGame(data.gameName);
+    joinGame(client, game, data.playerName);
+    client.sendMessage("client.state", formClientState(client));
     broadcastLobbyState();
 }
 
 function handleLobbyJoinGame(client, data) {
-    const game = idToGameMap.get(data.game_id);
+    const game = idToGameMap.get(data.gameId);
     if (game != null) {
-        joinGame(client, game, data.player_name);
+        joinGame(client, game, data.playerName);
+        client.sendMessage("client.state", formClientState(client));
         broadcastLobbyState();
     } else {
-        throw new Errors.GameNotFoundError(data.game_id);
+        throw new Errors.GameNotFoundError(data.gameId);
     }
 }
 
@@ -113,14 +122,25 @@ function handleGameLeave(client, data) {
         game.removePlayer(client.playerId);
         client.gameId = null;
         client.playerId = null;
+
+        if (game.players.length === 0){
+            idToGameMap.delete(game.id);
+        }
     } else {
         throw new Errors.NotInGameError(client.id);
     }
+
+    client.sendMessage("client.state", formClientState(client));
+    broadcastLobbyState();
 }
 
 function handleGameState(client, data) {
     if (client.gameId !== null) {
         const game = idToGameMap.get(client.gameId);
+        if (game == null) {
+            throw new Errors.GameNotFoundError(client.gameId);
+        }
+
         client.sendMessage("game.state", formGameState(game));
     } else {
         throw new Errors.NotInGameError(client.id);
@@ -151,15 +171,15 @@ async function handleGameSubmit(client, data) {
             game.setReady(client.playerId, false);
             break;
         case "context":
-            game.submitContext(payload.context_description);
+            game.submitContext(payload.contextDescription);
             break;
-        case "faction_concept":
+        case "factionConcept":
             factionId = game.getFactionByPlayerId(client.playerId).id;
-            game.submitFactionConceptAndName(factionId, payload.faction_concept_descrption, payload.faction_name);
+            game.submitFactionConceptAndName(factionId, payload.factionConceptDescription, payload.factionName);
             break;
-        case "faction_flaw":
+        case "factionFlaw":
             factionId = game.getFactionByPlayerId(client.playerId).id;
-            game.submitFactionFlaw(factionId, payload.faction_flaw_descrption);
+            game.submitFactionFlaw(factionId, payload.factionFlawDescription);
             
             if (game.phase === GamePhase.CONTEXT_SETUP){
                 broadcastGameState(game);
@@ -168,11 +188,11 @@ async function handleGameSubmit(client, data) {
             break;
         case "attack":
             factionId = game.getFactionByPlayerId(client.playerId).id;
-            game.submitAttack(factionId, payload.attack_description);
+            game.submitAttack(factionId, payload.attackDescription);
             break;
         case "defense":
             factionId = game.getFactionByPlayerId(client.playerId).id;
-            game.submitDefense(factionId, payload.defense_description);
+            game.submitDefense(factionId, payload.defenseDescription);
 
             if (game.phase === GamePhase.COMPETITION_ANALYZE) {
                 broadcastGameState(game);
@@ -226,6 +246,14 @@ function formGameState(game) {
         players: game.players,
         factions: game.factions,
         matches: game.matches
+    }
+}
+
+function formClientState(client) {
+    return {
+        id: client.id,
+        gameId: client.gameId,
+        playerId: client.playerId
     }
 }
 

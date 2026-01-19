@@ -105,7 +105,7 @@ public class Match
 
 public class GameState
 {
-    [JsonProperty("gameId")]
+    [JsonProperty("id")]
     public string Id;
 
     [JsonProperty("phase")]
