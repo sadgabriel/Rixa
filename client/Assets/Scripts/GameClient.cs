@@ -21,6 +21,99 @@ public class GameClient : MonoBehaviour
         wsClient.OnMessage -= HandleMessage;
     }
 
+    public void RequestClientState()
+    {
+        wsClient.Send("client.state", new { });
+    }
+
+    public void RequestLobbyState()
+    {
+        wsClient.Send("lobby.state", new { });
+    }
+
+    public void CreateGame(string gameName, string playerName)
+    {
+        wsClient.Send("lobby.createGame", new
+        {
+            gameName,
+            playerName
+        });
+    }
+
+    public void JoinGame(string gameId, string playerName)
+    {
+        wsClient.Send("lobby.joinGame", new
+        {
+            gameId,
+            playerName
+        });
+    }
+
+    public void LeaveGame()
+    {
+        wsClient.Send("game.leave", new { });
+    }
+
+    public void RequestGameState()
+    {
+        wsClient.Send("game.state", new { });
+    }
+
+    public void SetReady(bool ready)
+    {
+        Submit(ready ? "ready" : "unready", new { });
+    }
+
+    public void SubmitContext(string contextDescription)
+    {
+        Submit("context", new
+        {
+            contextDescription
+        });
+    }
+
+    public void SubmitFactionConcept(string factionConceptDescription, string factionName)
+    {
+        Submit("factionConcept", new
+        {
+            factionConceptDescription,
+            factionName
+        });
+    }
+
+    public void SubmitFactionFlaw(string factionFlawDescription)
+    {
+        Submit("factionFlaw", new
+        {
+            factionFlawDescription
+        });
+    }
+
+    public void SubmitAttack(string attackDescription)
+    {
+        Submit("attack", new
+        {
+            attackDescription
+        });
+    }
+
+    public void SubmitDefense(string defenseDescription)
+    {
+        Submit("defense", new
+        {
+            defenseDescription
+        });
+    }
+
+    private void Submit(string kind, object payload)
+    {
+        wsClient.Send("game.submit", new
+        {
+            kind,
+            payload
+        });
+    }
+
     private void HandleMessage(string type, JToken data)
     {
         switch (type)
