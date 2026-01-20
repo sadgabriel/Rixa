@@ -7,9 +7,9 @@ public class GameClient : MonoBehaviour
 {
     [SerializeField] private WsClient wsClient;
 
-    public event Action<ClientState> OnClientStateUpdate;
-    public event Action<LobbyState> OnLobbyStateUpdate;
-    public event Action<GameState> OnGameStateUpdate;
+    public event Action<ClientState> OnClientStateUpdated;
+    public event Action<LobbyState> OnLobbyStateUpdated;
+    public event Action<GameState> OnGameStateUpdated;
 
     private void Awake()
     {
@@ -138,25 +138,25 @@ public class GameClient : MonoBehaviour
         ClientState clientState = data["clientState"].ToObject<ClientState>();
         LobbyState lobbyState = data["lobbyState"].ToObject<LobbyState>();
         
-        OnClientStateUpdate?.Invoke(clientState);
-        OnLobbyStateUpdate?.Invoke(lobbyState);
+        OnClientStateUpdated?.Invoke(clientState);
+        OnLobbyStateUpdated?.Invoke(lobbyState);
     }
 
     private void HandleClientStateMessage(JToken data)
     {
         ClientState clientState = data.ToObject<ClientState>();
-        OnClientStateUpdate?.Invoke(clientState);
+        OnClientStateUpdated?.Invoke(clientState);
     }
 
     private void HandleLobbyStateMessage(JToken data)
     {
         LobbyState lobbyState = data.ToObject<LobbyState>();
-        OnLobbyStateUpdate?.Invoke(lobbyState);
+        OnLobbyStateUpdated?.Invoke(lobbyState);
     }
 
     private void HandleGameStateMessage(JToken data)
     {
         GameState gameState = data.ToObject<GameState>();
-        OnGameStateUpdate?.Invoke(gameState);
+        OnGameStateUpdated?.Invoke(gameState);
     }
 }

@@ -97,6 +97,7 @@ function handleLobbyCreateGame(client, data) {
     joinGame(client, game, data.playerName);
     client.sendMessage("client.state", formClientState(client));
     broadcastLobbyState();
+    broadcastGameState(game);
 }
 
 function handleLobbyJoinGame(client, data) {
@@ -105,6 +106,7 @@ function handleLobbyJoinGame(client, data) {
         joinGame(client, game, data.playerName);
         client.sendMessage("client.state", formClientState(client));
         broadcastLobbyState();
+        broadcastGameState(game);
     } else {
         throw new Errors.GameNotFoundError(data.gameId);
     }
