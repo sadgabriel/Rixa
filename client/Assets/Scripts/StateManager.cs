@@ -28,9 +28,9 @@ public class StateManager : MonoBehaviour
     private ClientState currentClientState = null;
     private LobbyState currentLobbyState = null;
     private GameState currentGameState = null;
-    private UIState currentUiState = UIState.IDLE;
+    private UIState currentUIState = UIState.IDLE;
 
-    public event Action<UIState, UIState> OnUiStateChanged;
+    public event Action<UIState, UIState> OnUIStateChanged;
 
     public ClientState CurrentClientState
     {
@@ -50,15 +50,15 @@ public class StateManager : MonoBehaviour
         private set { currentGameState = value; }
     }
 
-    public UIState CurrentUiState
+    public UIState CurrentUIState
     {
-        get { return currentUiState; }
+        get { return currentUIState; }
         private set
         {
-            if (currentUiState == value) return;
-            UIState oldState = currentUiState;
-            currentUiState = value;
-            OnUiStateChanged?.Invoke(oldState, currentUiState);
+            if (currentUIState == value) return;
+            UIState oldState = currentUIState;
+            currentUIState = value;
+            OnUIStateChanged?.Invoke(oldState, currentUIState);
         }
     }
 
@@ -131,15 +131,15 @@ public class StateManager : MonoBehaviour
     {
         if (IsInGame())
         {
-            CurrentUiState = MapPhaseToUIState(CurrentGameState.Phase);
+            CurrentUIState = MapPhaseToUIState(CurrentGameState.Phase);
         }
         else if (IsInLobby())
         {
-            CurrentUiState = UIState.APP_LOBBY;
+            CurrentUIState = UIState.APP_LOBBY;
         }
         else
         {
-            CurrentUiState = UIState.IDLE;
+            CurrentUIState = UIState.IDLE;
         }
     }
 
