@@ -30,7 +30,7 @@ public class StateManager : MonoBehaviour
     private GameState currentGameState = null;
     private UIState currentUIState = UIState.IDLE;
 
-    public event Action<UIState, UIState> OnUIStateChanged;
+    public event Action<UIState> OnUIStateUpdated;
 
     public ClientState CurrentClientState
     {
@@ -56,9 +56,8 @@ public class StateManager : MonoBehaviour
         private set
         {
             if (currentUIState == value) return;
-            UIState oldState = currentUIState;
             currentUIState = value;
-            OnUIStateChanged?.Invoke(oldState, currentUIState);
+            OnUIStateUpdated?.Invoke(currentUIState);
         }
     }
 

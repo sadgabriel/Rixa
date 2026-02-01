@@ -8,7 +8,7 @@ public class LobbyGameInfo
     [JsonProperty("name")]
     public string Name;
     [JsonProperty("state")]
-    public string State;
+    public string State; // "waiting" or "playing"
     [JsonProperty("playerCount")]
     public int PlayerCount;
 }

@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
 
     private Dictionary<UIState, Panel> panels;
 
-    private UIState? current;
+    private UIState current = UIState.IDLE;
 
     private void Awake()
     {
@@ -23,17 +23,17 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        stateManager.OnUIStateChanged += HandleUiStateChanged;
+        stateManager.OnUIStateUpdated += HandleUIStateUpdated;
     }
 
     private void OnDisable()
     {
-        stateManager.OnUIStateChanged -= HandleUiStateChanged;
+        stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
     }
 
-    private void HandleUiStateChanged(UIState oldState, UIState nextState)
+    private void HandleUIStateUpdated(UIState nextState)
     {
-        if (current.HasValue && panels.TryGetValue(current.Value, out var oldPanel))
+        if (panels.TryGetValue(current, out var oldPanel))
         {
             oldPanel.Hide();
         }
