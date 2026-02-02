@@ -24,6 +24,8 @@ public enum UIState
 
 public class StateManager : MonoBehaviour
 {
+    public static StateManager Instance { get; private set; }
+
     [SerializeField] private GameClient gameClient;
     private ClientState currentClientState = null;
     private LobbyState currentLobbyState = null;
@@ -96,6 +98,17 @@ public class StateManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         gameClient.OnClientStateUpdated += HandleClientStateUpdated;
         gameClient.OnLobbyStateUpdated += HandleLobbyStateUpdated;
         gameClient.OnGameStateUpdated += HandleGameStateUpdated;
@@ -106,6 +119,11 @@ public class StateManager : MonoBehaviour
         gameClient.OnClientStateUpdated -= HandleClientStateUpdated;
         gameClient.OnLobbyStateUpdated -= HandleLobbyStateUpdated;
         gameClient.OnGameStateUpdated -= HandleGameStateUpdated;
+
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     private UIState MapPhaseToUIState(string phase)

@@ -5,7 +5,8 @@ using Newtonsoft.Json.Linq;
 
 public class GameClient : MonoBehaviour
 {
-    [SerializeField] private WsClient wsClient;
+    public static GameClient Instance { get; private set; }
+    private WsClient wsClient;
 
     public event Action<ClientState> OnClientStateUpdated;
     public event Action<LobbyState> OnLobbyStateUpdated;
@@ -13,12 +14,33 @@ public class GameClient : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         wsClient.OnMessage += HandleMessage;
+    }
+
+    private void Start()
+    {
+        wsClient = WsClient.Instance;
     }
 
     private void OnDestroy()
     {
         wsClient.OnMessage -= HandleMessage;
+
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     public void RequestClientState()

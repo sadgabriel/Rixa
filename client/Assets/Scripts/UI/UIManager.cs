@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
-    public StateManager stateManager;
+    public static UIManager Instance { get; private set; }
+
+    private StateManager stateManager;
 
     private Dictionary<UIState, Panel> panels;
 
@@ -12,6 +14,17 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         panels = new Dictionary<UIState, Panel>();
         
         foreach (var panel in GetComponentsInChildren<Panel>(true))
@@ -21,14 +34,20 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    private void Start()
     {
+        stateManager = StateManager.Instance;
         stateManager.OnUIStateUpdated += HandleUIStateUpdated;
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
+
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     private void HandleUIStateUpdated(UIState nextState)

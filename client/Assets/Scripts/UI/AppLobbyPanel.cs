@@ -12,8 +12,10 @@ public class AppLobbyPanel : Panel
     private List<GameRoomItem> activeRoomItems = new List<GameRoomItem>();
     private GameRoomItem selectedRoom = null;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         createGameButton.onClick.AddListener(OnCreateGameClicked);
         joinGameButton.onClick.AddListener(OnJoinGameClicked);
 

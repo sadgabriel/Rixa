@@ -4,9 +4,12 @@ using UnityEngine;
 using NativeWebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 
 public class WsClient : MonoBehaviour
 {
+    public static WsClient Instance { get; private set; }
+
     [SerializeField] private string serverUrl = "ws://localhost:7363";
     private NativeWebSocket.WebSocket ws;
 
@@ -19,6 +22,17 @@ public class WsClient : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         ws = new NativeWebSocket.WebSocket(serverUrl);
 
         ws.OnOpen += () =>
@@ -92,6 +106,11 @@ public class WsClient : MonoBehaviour
         if (ws != null)
         {
             ws.Close();
+        }
+
+        if (Instance == this)
+        {
+            Instance = null;
         }
     }
 }
