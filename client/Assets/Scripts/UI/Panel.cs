@@ -4,11 +4,13 @@ using System;
 public class Panel : MonoBehaviour
 {
     [SerializeField] private UIState panelState;
-    private StateManager stateManager;
+    protected StateManager stateManager;
+    protected DialogManager dialogManager;
 
     protected virtual void Start()
     {
         stateManager = StateManager.Instance;
+        dialogManager = DialogManager.Instance;
     }
 
     public UIState PanelState

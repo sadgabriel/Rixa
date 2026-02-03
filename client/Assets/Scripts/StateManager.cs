@@ -26,7 +26,7 @@ public class StateManager : MonoBehaviour
 {
     public static StateManager Instance { get; private set; }
 
-    [SerializeField] private GameClient gameClient;
+    private GameClient gameClient;
     private ClientState currentClientState = null;
     private LobbyState currentLobbyState = null;
     private GameState currentGameState = null;
@@ -108,7 +108,11 @@ public class StateManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
 
+    private void Start()
+    {
+        gameClient = GameClient.Instance;
         gameClient.OnClientStateUpdated += HandleClientStateUpdated;
         gameClient.OnLobbyStateUpdated += HandleLobbyStateUpdated;
         gameClient.OnGameStateUpdated += HandleGameStateUpdated;

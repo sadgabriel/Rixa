@@ -24,13 +24,12 @@ public class GameClient : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        wsClient.OnMessage += HandleMessage;
     }
 
     private void Start()
     {
         wsClient = WsClient.Instance;
+        wsClient.OnMessage += HandleMessage;
     }
 
     private void OnDestroy()

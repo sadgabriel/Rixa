@@ -15,10 +15,6 @@ public class AppLobbyPanel : Panel
     protected override void Start()
     {
         base.Start();
-
-        createGameButton.onClick.AddListener(OnCreateGameClicked);
-        joinGameButton.onClick.AddListener(OnJoinGameClicked);
-
         joinGameButton.interactable = false;
     }
 
@@ -88,20 +84,31 @@ public class AppLobbyPanel : Panel
 
     private void OnCreateGameClicked()
     {
-        Debug.Log("게임 생성 버튼 클릭");
-        
-        // TODO: 게임 생성 요청
-        // GameClient를 통해 서버에 게임 생성 요청
+        dialogManager.ShowCreateGameDialog(
+            onConfirm: (gameName, playerName) =>
+            {
+                Debug.Log($"게임 생성: {gameName} (플레이어 이름: {playerName})");
+            },
+            onCancel: () =>
+            {
+                Debug.Log("게임 생성 취소");
+            }
+        );
     }
 
     private void OnJoinGameClicked()
     {
         if (selectedRoom == null) return;
 
-        string gameId = selectedRoom.RoomData.Id;
-        Debug.Log($"게임 참여: {selectedRoom.RoomData.Name} (ID: {gameId})");
-        
-        // TODO: 게임 참여 요청
-        // GameClient를 통해 서버에 게임 참여 요청
+        dialogManager.JoinGameDialog(
+            onConfirm: (playerName) =>
+            {
+                Debug.Log($"게임 참가: {selectedRoom.RoomData.Name} (플레이어 이름: {playerName})");
+            },
+            onCancel: () =>
+            {
+                Debug.Log("게임 참가 취소");
+            }
+        );
     }
 }
