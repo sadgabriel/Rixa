@@ -1,9 +1,32 @@
+using System;
 using UnityEngine;
 
 public class CreateGameDialog : Dialog
 {
-    public void SetCallbacks(System.Action<string, string> onConfirm, System.Action onCancel = null)
+    private Action<string, string> onConfirmCallback;
+    private Action onCancelCallback;
+    
+    public void SetCallbacks(Action<string, string> onConfirm, Action onCancel = null)
     {
-        // 콜백 설정 로직 구현
+        onConfirmCallback = onConfirm;
+        onCancelCallback = onCancel;
+    }
+
+    public void OnConfirmButtonClicked()
+    {
+        if (onConfirmCallback != null)
+        {
+            string gameName = "";
+            string playerName = "";
+            onConfirmCallback.Invoke(gameName, playerName);
+        }
+    }
+
+    public void OnCancelButtonClicked()
+    {
+        if (onCancelCallback != null)
+        {
+            onCancelCallback.Invoke();
+        }
     }
 }

@@ -16,10 +16,6 @@ public class AppLobbyPanel : Panel
     {
         base.Start();
         joinGameButton.interactable = false;
-    }
-
-    private void OnEnable()
-    {
         RefreshLobbyList();
     }
 
