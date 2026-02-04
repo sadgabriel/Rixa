@@ -76,7 +76,9 @@ public class WsClient : MonoBehaviour
 
     private void Update()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         ws?.DispatchMessageQueue();
+#endif
     }
 
     public async void Disconnect()
