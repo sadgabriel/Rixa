@@ -6,11 +6,13 @@ public class Panel : MonoBehaviour
     [SerializeField] private UIState panelState;
     protected StateManager stateManager;
     protected DialogManager dialogManager;
+    protected GameClient gameClient;
 
     protected virtual void Start()
     {
         stateManager = StateManager.Instance;
         dialogManager = DialogManager.Instance;
+        gameClient = GameClient.Instance;
     }
 
     public UIState PanelState

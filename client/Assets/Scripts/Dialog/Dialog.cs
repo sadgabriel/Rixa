@@ -8,9 +8,4 @@ public class Dialog : MonoBehaviour
     {
         dialogManager = DialogManager.Instance;
     }
-
-    public void Close()
-    {
-        dialogManager.CloseTopDialog();
-    }
 }

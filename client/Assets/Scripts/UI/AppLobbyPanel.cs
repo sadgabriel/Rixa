@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -83,11 +84,12 @@ public class AppLobbyPanel : Panel
         dialogManager.ShowCreateGameDialog(
             onConfirm: (gameName, playerName) =>
             {
-                Debug.Log($"게임 생성: {gameName} (플레이어 이름: {playerName})");
+                gameClient.CreateGame(gameName, playerName);
+                dialogManager.CloseTopDialog();
             },
             onCancel: () =>
             {
-                Debug.Log("게임 생성 취소");
+                dialogManager.CloseTopDialog();
             }
         );
     }
@@ -99,11 +101,12 @@ public class AppLobbyPanel : Panel
         dialogManager.ShowJoinGameDialog(
             onConfirm: (playerName) =>
             {
-                Debug.Log($"게임 참가: {selectedRoom.RoomData.Name} (플레이어 이름: {playerName})");
+                gameClient.JoinGame(selectedRoom.RoomData.Id, playerName);
+                dialogManager.CloseTopDialog();
             },
             onCancel: () =>
             {
-                Debug.Log("게임 참가 취소");
+                dialogManager.CloseTopDialog();
             }
         );
     }
