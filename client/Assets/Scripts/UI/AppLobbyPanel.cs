@@ -78,7 +78,7 @@ public class AppLobbyPanel : Panel
         }
     }
 
-    private void OnCreateGameClicked()
+    public void OnCreateGameClicked()
     {
         dialogManager.ShowCreateGameDialog(
             onConfirm: (gameName, playerName) =>
@@ -92,11 +92,11 @@ public class AppLobbyPanel : Panel
         );
     }
 
-    private void OnJoinGameClicked()
+    public void OnJoinGameClicked()
     {
         if (selectedRoom == null) return;
 
-        dialogManager.JoinGameDialog(
+        dialogManager.ShowJoinGameDialog(
             onConfirm: (playerName) =>
             {
                 Debug.Log($"게임 참가: {selectedRoom.RoomData.Name} (플레이어 이름: {playerName})");

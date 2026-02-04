@@ -1,8 +1,11 @@
 using System;
 using UnityEngine;
+using TMPro;
 
 public class JoinGameDialog : Dialog
 {   
+    [SerializeField] private TMP_InputField playerNameInputField;
+
     private Action<string> onConfirmCallback;
     private Action onCancelCallback;
     
@@ -16,7 +19,7 @@ public class JoinGameDialog : Dialog
     {
         if (onConfirmCallback != null)
         {
-            string playerName = "";
+            string playerName = playerNameInputField.text;
             onConfirmCallback.Invoke(playerName);
         }
     }

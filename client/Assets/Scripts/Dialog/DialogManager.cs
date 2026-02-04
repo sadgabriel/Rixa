@@ -54,7 +54,7 @@ public class DialogManager : MonoBehaviour
         createGameDialog?.SetCallbacks(onConfirm, onCancel);
     }
 
-    public void JoinGameDialog(Action<string> onConfirm, Action onCancel = null)
+    public void ShowJoinGameDialog(Action<string> onConfirm, Action onCancel = null)
     {
         GameObject dialogGO = ShowDialog(joinGameDialogPrefab);
         JoinGameDialog joinGameDialog = dialogGO.GetComponent<JoinGameDialog>();

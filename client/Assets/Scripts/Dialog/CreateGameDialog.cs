@@ -1,10 +1,15 @@
 using System;
 using UnityEngine;
+using TMPro;
 
 public class CreateGameDialog : Dialog
 {
+    [SerializeField] private TMP_InputField gameNameInputField;
+    [SerializeField] private TMP_InputField playerNameInputField;
+
     private Action<string, string> onConfirmCallback;
     private Action onCancelCallback;
+    
     
     public void SetCallbacks(Action<string, string> onConfirm, Action onCancel = null)
     {
@@ -16,8 +21,8 @@ public class CreateGameDialog : Dialog
     {
         if (onConfirmCallback != null)
         {
-            string gameName = "";
-            string playerName = "";
+            string gameName = gameNameInputField.text;
+            string playerName = playerNameInputField.text;
             onConfirmCallback.Invoke(gameName, playerName);
         }
     }
