@@ -1,11 +1,13 @@
-import WebSocket from 'ws';
+import { WebSocketServer } from 'ws';
 import { Client } from './client.js'
 import { Game, GamePhase } from './game.js'
 import { Judge } from './judge.js'
 import * as Errors from './errors.js';
 
 const PORT = 7363;
-const wss = new WebSocket.Server({ port: PORT });
+const wss = new WebSocketServer({ port: PORT });
+
+console.log(`WebSocket server is running on ws://localhost:${PORT}`);
 
 const idToClientMap = new Map();
 const socketToClientMap = new Map();
@@ -15,6 +17,8 @@ wss.on('connection', (ws) => {
     const client = new Client(ws);
     idToClientMap.set(client.id, client);
     socketToClientMap.set(ws, client);
+
+    console.log(`Client connected: ${client.id}`);
 
     client.sendMessage("welcome", {
         clientState: formClientState(client),
@@ -26,6 +30,7 @@ wss.on('connection', (ws) => {
 
         try {
             const [type, data] = parseJson(message);
+            console.log(`Received message from client ${client.id}:`, type);
 
             switch (type) {
                 case "client.state":
@@ -60,7 +65,35 @@ wss.on('connection', (ws) => {
 
     ws.on('close', () => {
         if (client.gameId !== null) {
-            // Handle client disconnection from game
+            const game = idToGameMap.get(client.gameId);
+            if (game != null) {
+                if (game.phase === GamePhase.LOBBY) {
+                    game.removePlayer(client.playerId);
+
+                    if (game.players.length === 0){
+                        idToGameMap.delete(game.id);
+                    }
+
+                    broadcastLobbyState();
+                    broadcastGameState(game);
+                } else {
+                    for (const player of game.players) {
+                        try {
+                            const playerClient = findClientByPlayerId(player.id);
+                            playerClient.gameId = null;
+                            playerClient.playerId = null;
+                            playerClient.sendMessage("client.state", formClientState(playerClient));
+                        } catch (error) {
+                            if (!(error instanceof Errors.PlayerNotFoundError)) {
+                                console.error(`Error handling disconnect for player ${player.id}:`, error);
+                            }
+                        }
+                    }
+
+                    idToGameMap.delete(game.id);
+                    broadcastLobbyState();
+                }
+            }
         }
 
         idToClientMap.delete(client.id);

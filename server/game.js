@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createPlayer } from './player.js';
 import { createFaction } from './faction.js';
 import { createMatch } from './match.js';
-import { createContext } from '.context.js';
+import { createContext } from './context.js';
 import { BALANCE } from './balanceConfig.js';
 import * as Errors from './errors.js';
 
