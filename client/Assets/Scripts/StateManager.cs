@@ -30,8 +30,8 @@ public class StateManager : MonoBehaviour
     private ClientState currentClientState = null;
     private LobbyState currentLobbyState = null;
     private GameState currentGameState = null;
-    private UIState currentUIState = UIState.IDLE;
-
+    [SerializeField] private UIState currentUIState = UIState.IDLE;
+    
     public event Action<UIState> OnUIStateUpdated;
 
     public ClientState CurrentClientState
@@ -57,7 +57,6 @@ public class StateManager : MonoBehaviour
         get { return currentUIState; }
         private set
         {
-            if (currentUIState == value) return;
             currentUIState = value;
             OnUIStateUpdated?.Invoke(currentUIState);
         }

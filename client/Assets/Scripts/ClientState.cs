@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 public class ClientState
 {
     [JsonProperty("id")]
-    public string Id;
+    public string Id { get; set; }
     [JsonProperty("playerId")]
-    public string PlayerId;
+    public string PlayerId { get; set; }
     [JsonProperty("gameId")]
-    public string GameId;
+    public string GameId { get; set; }
 }

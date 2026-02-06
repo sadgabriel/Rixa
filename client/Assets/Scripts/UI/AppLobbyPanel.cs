@@ -17,11 +17,24 @@ public class AppLobbyPanel : Panel
     {
         base.Start();
         joinGameButton.interactable = false;
+        StateManager.Instance.OnUIStateUpdated += (state) =>
+        {
+            if (state == PanelState)
+            {
+                RefreshLobbyList();
+            }
+        };
+    }
+
+    public override void Show()
+    {
+        base.Show();
         RefreshLobbyList();
     }
 
     public void RefreshLobbyList()
     {
+        Debug.Log("Refreshing lobby list...");
         ClearRoomList();
 
         LobbyState lobbyState = stateManager.CurrentLobbyState;

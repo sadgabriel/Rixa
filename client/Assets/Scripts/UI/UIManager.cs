@@ -27,11 +27,13 @@ public class UIManager : MonoBehaviour
 
         panels = new Dictionary<UIState, Panel>();
         
-        foreach (var panel in GetComponentsInChildren<Panel>(true))
+        foreach (var panel in FindObjectsByType<Panel>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             panels.Add(panel.PanelState, panel);
             panel.Hide();
         }
+
+        Debug.Log(panels.Count + " panels registered in UIManager.");
     }
 
     private void Start()
@@ -52,6 +54,11 @@ public class UIManager : MonoBehaviour
 
     private void HandleUIStateUpdated(UIState nextState)
     {
+        if (nextState == current)
+        {
+            return;
+        }
+
         if (panels.TryGetValue(current, out var oldPanel))
         {
             oldPanel.Hide();

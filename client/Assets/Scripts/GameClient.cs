@@ -137,6 +137,7 @@ public class GameClient : MonoBehaviour
 
     private void HandleMessage(string type, JToken data)
     {
+        Debug.Log($"Handling WebSocket Message: Type={type}, Data={data.ToString(Formatting.None)}");
         switch (type)
         {
             case "welcome":
@@ -158,7 +159,7 @@ public class GameClient : MonoBehaviour
     {
         ClientState clientState = data["clientState"].ToObject<ClientState>();
         LobbyState lobbyState = data["lobbyState"].ToObject<LobbyState>();
-        
+
         OnClientStateUpdated?.Invoke(clientState);
         OnLobbyStateUpdated?.Invoke(lobbyState);
     }

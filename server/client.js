@@ -23,6 +23,7 @@ export class Client {
     }
 
     sendMessage(type, data) {
+        console.log(`Sending message to client ${this.id}:`, type);
         const message = JSON.stringify({ type, data });
         this.send(message);
     }

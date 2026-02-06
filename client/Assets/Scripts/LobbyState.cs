@@ -4,17 +4,17 @@ using Newtonsoft.Json;
 public class LobbyGameInfo
 {
     [JsonProperty("id")]
-    public string Id;
+    public string Id { get; set; }
     [JsonProperty("name")]
-    public string Name;
+    public string Name { get; set; }
     [JsonProperty("state")]
-    public string State; // "waiting" or "playing"
+    public string State { get; set; } // "waiting" or "playing"
     [JsonProperty("playerCount")]
-    public int PlayerCount;
+    public int PlayerCount { get; set; }
 }
 
 public class LobbyState
 {
     [JsonProperty("games")]
-    public List<LobbyGameInfo> Games;
+    public List<LobbyGameInfo> Games { get; set; }
 }

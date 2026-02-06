@@ -98,6 +98,7 @@ wss.on('connection', (ws) => {
 
         idToClientMap.delete(client.id);
         socketToClientMap.delete(ws);
+        console.log(`Client disconnected: ${client.id}`);
     })
 })
 

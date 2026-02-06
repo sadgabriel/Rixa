@@ -4,125 +4,125 @@ using Newtonsoft.Json;
 public class Context
 {
     [JsonProperty("rawContextDescription")]
-    public string RawContextDescription;
+    public string RawContextDescription { get; set; }
 
     [JsonProperty("description")]
-    public string Description;
+    public string Description { get; set; }
 
     [JsonProperty("eventLog")]
-    public List<string> EventLog;
+    public List<string> EventLog { get; set; }
 }
 
 public class Player
 {
     [JsonProperty("id")]
-    public string Id;
+    public string Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name;
+    public string Name { get; set; }
 
     [JsonProperty("factionId")]
-    public string FactionId;
+    public string FactionId { get; set; }
 
     [JsonProperty("ready")]
-    public bool Ready;
+    public bool Ready { get; set; }
 }
 
 public class Faction
 {
     [JsonProperty("id")]
-    public string Id;
+    public string Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name;
+    public string Name { get; set; }
 
     [JsonProperty("rawConcept")]
-    public string RawConcept;
+    public string RawConcept { get; set; }
 
     [JsonProperty("rawFlaw")]
-    public string RawFlaw;
+    public string RawFlaw { get; set; }
 
     [JsonProperty("description")]
-    public string Description;
+    public string Description { get; set; }
 
     [JsonProperty("resources")]
-    public List<Resource> Resources;
+    public List<Resource> Resources { get; set; }
 
     [JsonProperty("score")]
-    public int Score;
+    public int Score { get; set; }
 }
 
 public class Resource
 {
     [JsonProperty("name")]
-    public string Name;
+    public string Name { get; set; }
 
     [JsonProperty("description")]
-    public string Description;
+    public string Description { get; set; }
 
     [JsonProperty("count")]
-    public int Count;
+    public int Count { get; set; }
 }
 
 public class Match
 {
     [JsonProperty("id")]
-    public string Id;
+    public string Id { get; set; }
 
     [JsonProperty("attackerId")]
-    public string AttackerId;
+    public string AttackerId { get; set; }
 
     [JsonProperty("defenderId")]
-    public string DefenderId;
+    public string DefenderId { get; set; }
 
     [JsonProperty("attackDescription")]
-    public string AttackDescription;
+    public string AttackDescription { get; set; }
 
     [JsonProperty("defenseDescription")]
-    public string DefenseDescription;
+    public string DefenseDescription { get; set; }
 
     [JsonProperty("attackerTags")]
-    public List<string> AttackerTags;
+    public List<string> AttackerTags { get; set; }
 
     [JsonProperty("defenderTags")]
-    public List<string> DefenderTags;
+    public List<string> DefenderTags { get; set; }
 
     [JsonProperty("targetedResources")]
-    public List<string> TargetedResources;
+    public List<string> TargetedResources { get; set; }
 
     [JsonProperty("protectedResources")]
-    public List<string> ProtectedResources;
+    public List<string> ProtectedResources { get; set; }
 
     [JsonProperty("winnerId")]
-    public string WinnerId;
+    public string WinnerId { get; set; }
 
     [JsonProperty("lostResource")]
-    public string LostResource;
+    public string LostResource { get; set; }
 
     [JsonProperty("displayNarrative")]
-    public string DisplayNarrative;
+    public string DisplayNarrative { get; set; }
 }
 
 public class GameState
 {
     [JsonProperty("id")]
-    public string Id;
+    public string Id { get; set; }
 
     [JsonProperty("phase")]
-    public string Phase;
+    public string Phase { get; set; }
 
     [JsonProperty("round")]
-    public int Round;
+    public int Round { get; set; }
 
     [JsonProperty("context")]
-    public Context Context;
+    public Context Context { get; set; }
 
     [JsonProperty("players")]
-    public List<Player> Players;
+    public List<Player> Players { get; set; }
 
     [JsonProperty("factions")]
-    public List<Faction> Factions;
+    public List<Faction> Factions { get; set; }
 
     [JsonProperty("matches")]
-    public List<Match> Matches;
+    public List<Match> Matches { get; set; }
 }
