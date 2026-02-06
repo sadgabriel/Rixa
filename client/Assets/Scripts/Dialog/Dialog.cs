@@ -4,7 +4,7 @@ public class Dialog : MonoBehaviour
 {
     protected DialogManager dialogManager;
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         dialogManager = DialogManager.Instance;
     }

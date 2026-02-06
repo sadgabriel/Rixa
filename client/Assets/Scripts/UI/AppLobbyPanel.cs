@@ -13,9 +13,9 @@ public class AppLobbyPanel : Panel
     private List<GameRoomItem> activeRoomItems = new List<GameRoomItem>();
     private GameRoomItem selectedRoom = null;
 
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
         joinGameButton.interactable = false;
         StateManager.Instance.OnUIStateUpdated += (state) =>
         {
@@ -34,7 +34,6 @@ public class AppLobbyPanel : Panel
 
     public void RefreshLobbyList()
     {
-        Debug.Log("Refreshing lobby list...");
         ClearRoomList();
 
         LobbyState lobbyState = stateManager.CurrentLobbyState;

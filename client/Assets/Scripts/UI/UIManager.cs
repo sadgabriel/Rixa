@@ -4,7 +4,18 @@ using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager Instance { get; private set; }
+    private static UIManager instance;
+    public static UIManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<UIManager>();
+            }
+            return instance;
+        }
+    }
 
     private StateManager stateManager;
 
@@ -14,16 +25,17 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            instance = this;
+            
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        DontDestroyOnLoad(gameObject);
 
         panels = new Dictionary<UIState, Panel>();
         
@@ -33,11 +45,6 @@ public class UIManager : MonoBehaviour
             panel.Hide();
         }
 
-        Debug.Log(panels.Count + " panels registered in UIManager.");
-    }
-
-    private void Start()
-    {
         stateManager = StateManager.Instance;
         stateManager.OnUIStateUpdated += HandleUIStateUpdated;
     }
@@ -46,9 +53,9 @@ public class UIManager : MonoBehaviour
     {
         stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
 
-        if (Instance == this)
+        if (instance == this)
         {
-            Instance = null;
+            instance = null;
         }
     }
 

@@ -8,7 +8,18 @@ using System.ComponentModel;
 
 public class WsClient : MonoBehaviour
 {
-    public static WsClient Instance { get; private set; }
+    private static WsClient instance;
+    public static WsClient Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<WsClient>();
+            }
+            return instance;
+        }
+    }
 
     [SerializeField] private string serverUrl = "ws://localhost:7363";
     private NativeWebSocket.WebSocket ws;
@@ -22,17 +33,68 @@ public class WsClient : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            instance = this;
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        DontDestroyOnLoad(gameObject);
+        Initialize();
+    }
 
+    private async void Start()
+    {
+        await ws.Connect();
+    }
+
+    private void Update()
+    {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        ws?.DispatchMessageQueue();
+#endif
+    }
+
+    private void OnDestroy()
+    {
+        if (ws != null)
+        {
+            ws.Close();
+        }
+
+        if (instance == this)
+        {
+            instance = null;
+        }
+    }
+
+    public async void Disconnect()
+    {
+        if (ws != null)
+        {
+            await ws.Close();
+        }
+    }
+
+    public async void Send(string type, object data)
+    {
+        if (!IsConnected) return;
+
+        var message = new
+        {
+            type,
+            data
+        };
+
+        string text = JsonConvert.SerializeObject(message);
+        await ws.SendText(text);
+    }
+
+    private void Initialize()
+    {
         ws = new NativeWebSocket.WebSocket(serverUrl);
 
         ws.OnOpen += () =>
@@ -67,52 +129,5 @@ public class WsClient : MonoBehaviour
                 OnError?.Invoke($"Bad incoming JSON: {e.Message}");
             }
         };
-    }
-
-    private async void Start()
-    {
-        await ws.Connect();
-    }
-
-    private void Update()
-    {
-#if !UNITY_WEBGL || UNITY_EDITOR
-        ws?.DispatchMessageQueue();
-#endif
-    }
-
-    public async void Disconnect()
-    {
-        if (ws != null)
-        {
-            await ws.Close();
-        }
-    }
-
-    public async void Send(string type, object data)
-    {
-        if (!IsConnected) return;
-
-        var message = new
-        {
-            type,
-            data
-        };
-
-        string text = JsonConvert.SerializeObject(message);
-        await ws.SendText(text);
-    }
-
-    private void OnDestroy()
-    {
-        if (ws != null)
-        {
-            ws.Close();
-        }
-
-        if (Instance == this)
-        {
-            Instance = null;
-        }
     }
 }

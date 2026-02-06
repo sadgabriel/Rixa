@@ -5,7 +5,18 @@ using Newtonsoft.Json.Linq;
 
 public class GameClient : MonoBehaviour
 {
-    public static GameClient Instance { get; private set; }
+    private static GameClient instance;
+    public static GameClient Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<GameClient>();
+            }
+            return instance;
+        }
+    }
     private WsClient wsClient;
 
     public event Action<ClientState> OnClientStateUpdated;
@@ -14,20 +25,17 @@ public class GameClient : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            instance = this;
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
             return;
         }
-    }
+        DontDestroyOnLoad(gameObject);
 
-    private void Start()
-    {
         wsClient = WsClient.Instance;
         wsClient.OnMessage += HandleMessage;
     }
@@ -36,9 +44,9 @@ public class GameClient : MonoBehaviour
     {
         wsClient.OnMessage -= HandleMessage;
 
-        if (Instance == this)
+        if (instance == this)
         {
-            Instance = null;
+            instance = null;
         }
     }
 

@@ -24,7 +24,18 @@ public enum UIState
 
 public class StateManager : MonoBehaviour
 {
-    public static StateManager Instance { get; private set; }
+    private static StateManager instance;
+    public static StateManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<StateManager>();
+            }
+            return instance;
+        }
+    }
 
     private GameClient gameClient;
     private ClientState currentClientState = null;
@@ -97,20 +108,17 @@ public class StateManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            instance = this;
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
             return;
         }
-    }
+        DontDestroyOnLoad(gameObject);
 
-    private void Start()
-    {
         gameClient = GameClient.Instance;
         gameClient.OnClientStateUpdated += HandleClientStateUpdated;
         gameClient.OnLobbyStateUpdated += HandleLobbyStateUpdated;
@@ -123,9 +131,9 @@ public class StateManager : MonoBehaviour
         gameClient.OnLobbyStateUpdated -= HandleLobbyStateUpdated;
         gameClient.OnGameStateUpdated -= HandleGameStateUpdated;
 
-        if (Instance == this)
+        if (instance == this)
         {
-            Instance = null;
+            instance = null;
         }
     }
 

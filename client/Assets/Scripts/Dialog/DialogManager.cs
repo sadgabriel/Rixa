@@ -5,7 +5,18 @@ using UnityEngine.InputSystem;
 
 public class DialogManager : MonoBehaviour
 {
-    public static DialogManager Instance { get; private set; }
+    private static DialogManager instance;
+    public static DialogManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<DialogManager>();
+            }
+            return instance;
+        }
+    }
 
     [SerializeField] private GameObject modalBackground;
     [SerializeField] private Transform dialogContainer;
@@ -17,16 +28,17 @@ public class DialogManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            instance = this;
+            
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        DontDestroyOnLoad(gameObject);
 
         modalBackground.SetActive(false);
     }
@@ -41,9 +53,9 @@ public class DialogManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (Instance == this)
+        if (instance == this)
         {
-            Instance = null;
+            instance = null;
         }
     }
 

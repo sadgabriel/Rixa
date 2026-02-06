@@ -8,7 +8,7 @@ public class Panel : MonoBehaviour
     protected DialogManager dialogManager;
     protected GameClient gameClient;
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         stateManager = StateManager.Instance;
         dialogManager = DialogManager.Instance;
