@@ -4,6 +4,8 @@ using System;
 public class Panel : MonoBehaviour
 {
     [SerializeField] private UIState panelState;
+    [SerializeField] private bool isPersistent = false;
+
     protected StateManager stateManager;
     protected DialogManager dialogManager;
     protected GameClient gameClient;
@@ -18,6 +20,11 @@ public class Panel : MonoBehaviour
     public UIState PanelState
     {
         get { return panelState; }
+    }
+
+    public bool IsPersistent
+    {
+        get { return isPersistent; }
     }
 
     public virtual void Show()
