@@ -1,9 +1,12 @@
 using UnityEngine;
 using System;
 
+public enum UIContext { App, Game }
+
 public class Panel : MonoBehaviour
 {
     [SerializeField] private UIState panelState;
+    [SerializeField] private UIContext panelContext;
     [SerializeField] private bool isPersistent = false;
 
     protected StateManager stateManager;
@@ -20,6 +23,11 @@ public class Panel : MonoBehaviour
     public UIState PanelState
     {
         get { return panelState; }
+    }
+
+    public UIContext PanelContext
+    {
+        get { return panelContext; }
     }
 
     public bool IsPersistent

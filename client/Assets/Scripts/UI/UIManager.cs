@@ -19,8 +19,6 @@ public class UIManager : MonoBehaviour
 
     private StateManager stateManager;
 
-    private enum UIContext { App, Game }
-
     private Dictionary<UIState, Panel> statePanels = new Dictionary<UIState, Panel>();
     private Dictionary<UIContext, List<Panel>> persistentPanels = new Dictionary<UIContext, List<Panel>>()
     {
@@ -53,7 +51,7 @@ public class UIManager : MonoBehaviour
 
             if (panel.IsPersistent)
             {
-                UIContext context = GetContext(panel.PanelState);
+                UIContext context = panel.PanelContext;
                 persistentPanels[context].Add(panel);
             } else
             {
@@ -77,10 +75,8 @@ public class UIManager : MonoBehaviour
 
     private void HandleUIStateUpdated(UIState nextState)
     {
-        if (nextState == currentState)
-        {
-            return;
-        }
+        Debug.Log($"UIManager: Transitioning from {currentState} to {nextState}");
+        if (nextState == currentState) return;
 
         UIContext nextContext = GetContext(nextState);
 
@@ -96,8 +92,6 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        currentContext = nextContext;
-
         if (statePanels.TryGetValue(currentState, out var oldPanel))
         {
             oldPanel.Hide();
@@ -108,6 +102,7 @@ public class UIManager : MonoBehaviour
             newPanel.Show();
         }
 
+        currentContext = nextContext;
         currentState = nextState;
     }
 

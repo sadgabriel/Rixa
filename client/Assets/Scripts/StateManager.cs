@@ -1,8 +1,10 @@
 using UnityEngine;
 using System;
+using System.Linq;
 
 public enum UIState
 {
+    None,
     IDLE,
 
     APP_LOBBY,
@@ -106,6 +108,24 @@ public class StateManager : MonoBehaviour
         return CurrentClientState != null && CurrentLobbyState != null;
     }
 
+    public Player GetPlayerById(string playerId)
+    {
+        if (CurrentGameState == null || CurrentGameState.Players == null)
+        {
+            return null;
+        }
+        return CurrentGameState.Players.Find(p => p.Id == playerId);
+    }
+
+    public Faction GetFactionById(string factionId)
+    {
+        if (CurrentGameState == null || CurrentGameState.Factions == null)
+        {
+            return null;
+        }
+        return CurrentGameState.Factions.Find(f => f.Id == factionId);
+    }
+
     private void Awake()
     {
         if (instance == null)
@@ -159,7 +179,8 @@ public class StateManager : MonoBehaviour
     {
         if (IsInGame())
         {
-            CurrentUIState = MapPhaseToUIState(CurrentGameState.Phase);
+            var newState = MapPhaseToUIState(CurrentGameState.Phase);
+            CurrentUIState = newState;
         }
         else if (IsInLobby())
         {

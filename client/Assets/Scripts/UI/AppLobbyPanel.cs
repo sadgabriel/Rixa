@@ -13,23 +13,17 @@ public class AppLobbyPanel : Panel
     private List<GameRoomItem> activeRoomItems = new List<GameRoomItem>();
     private GameRoomItem selectedRoom = null;
 
-    protected override void Awake()
+    private void OnEnable()
     {
-        base.Awake();
         joinGameButton.interactable = false;
-        StateManager.Instance.OnUIStateUpdated += (state) =>
-        {
-            if (state == PanelState)
-            {
-                RefreshLobbyList();
-            }
-        };
-    }
-
-    public override void Show()
-    {
-        base.Show();
         RefreshLobbyList();
+        stateManager.OnUIStateUpdated += HandleUIStateUpdated;
+    }
+    
+    private void OnDisable()
+    {
+        stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
+        ClearRoomList();
     }
 
     public void RefreshLobbyList()
@@ -69,6 +63,12 @@ public class AppLobbyPanel : Panel
             Destroy(item.gameObject);
         }
         activeRoomItems.Clear();
+    }
+
+    private void HandleUIStateUpdated(UIState newState)
+    {
+        if (newState != PanelState) return;
+        RefreshLobbyList();
     }
 
     public void OnRoomItemClicked(GameRoomItem clickedItem)
