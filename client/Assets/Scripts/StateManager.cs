@@ -43,7 +43,7 @@ public class StateManager : MonoBehaviour
     private ClientState currentClientState = null;
     private LobbyState currentLobbyState = null;
     private GameState currentGameState = null;
-    [SerializeField] private UIState currentUIState = UIState.IDLE;
+    private UIState currentUIState = UIState.IDLE;
     
     public event Action<UIState> OnUIStateUpdated;
 
@@ -79,33 +79,53 @@ public class StateManager : MonoBehaviour
     {
         get
         {
-            string playerId = CurrentClientState?.PlayerId;
-            if (string.IsNullOrEmpty(playerId))
+            if (currentClientState == null || string.IsNullOrEmpty(currentClientState.PlayerId))
             {
                 return null;
             }
-            return CurrentGameState?.Players?.Find(p => p.Id == playerId);
+            
+            if (currentGameState?.Players == null)
+            {
+                return null;
+            }
+            
+            return currentGameState.Players.Find(p => p.Id == currentClientState.PlayerId);
         }
     }
 
     public bool IsInGame()
     {
-        string gameId = CurrentClientState?.GameId;
-        if (string.IsNullOrEmpty(gameId) || CurrentGameState?.Id != gameId || MyPlayer == null)
+        if (currentClientState == null || string.IsNullOrEmpty(currentClientState.GameId))
         {
             return false;
         }
+        
+        if (currentGameState == null || currentGameState.Id != currentClientState.GameId)
+        {
+            return false;
+        }
+        
+        if (MyPlayer == null)
+        {
+            return false;
+        }
+        
         return true;
     }
 
     public bool IsInLobby()
     {
+        if (currentClientState == null || currentLobbyState == null)
+        {
+            return false;
+        }
+        
         if (IsInGame())
         {
             return false;
         }
-
-        return CurrentClientState != null && CurrentLobbyState != null;
+        
+        return true;
     }
 
     public Player GetPlayerById(string playerId)
@@ -147,9 +167,12 @@ public class StateManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        gameClient.OnClientStateUpdated -= HandleClientStateUpdated;
-        gameClient.OnLobbyStateUpdated -= HandleLobbyStateUpdated;
-        gameClient.OnGameStateUpdated -= HandleGameStateUpdated;
+        if (gameClient != null)
+        {
+            gameClient.OnClientStateUpdated -= HandleClientStateUpdated;
+            gameClient.OnLobbyStateUpdated -= HandleLobbyStateUpdated;
+            gameClient.OnGameStateUpdated -= HandleGameStateUpdated;
+        }
 
         if (instance == this)
         {
@@ -179,17 +202,23 @@ public class StateManager : MonoBehaviour
     {
         if (IsInGame())
         {
-            var newState = MapPhaseToUIState(CurrentGameState.Phase);
-            CurrentUIState = newState;
+            if (string.IsNullOrEmpty(currentGameState?.Phase))
+            {
+                Debug.LogWarning("In game but phase is null, defaulting to GAME_LOBBY");
+                CurrentUIState = UIState.GAME_LOBBY;
+                return;
+            }
+            CurrentUIState = MapPhaseToUIState(currentGameState.Phase);
+            return;
         }
-        else if (IsInLobby())
+        
+        if (IsInLobby())
         {
             CurrentUIState = UIState.APP_LOBBY;
+            return;
         }
-        else
-        {
-            CurrentUIState = UIState.IDLE;
-        }
+        
+        CurrentUIState = UIState.IDLE;
     }
 
     private void HandleClientStateUpdated(ClientState state)

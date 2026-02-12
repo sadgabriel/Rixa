@@ -48,7 +48,15 @@ public class WsClient : MonoBehaviour
 
     private async void Start()
     {
-        await ws.Connect();
+        try
+        {
+            await ws.Connect();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"WebSocket connection failed: {e.Message}");
+            OnError?.Invoke($"Connection failed: {e.Message}");
+        }
     }
 
     private void Update()
@@ -60,7 +68,7 @@ public class WsClient : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (ws != null)
+        if (IsConnected)
         {
             ws.Close();
         }
