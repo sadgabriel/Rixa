@@ -41,6 +41,12 @@ public class PlayerDataItem : MonoBehaviour
 
     public void OnClick()
     {
-        Debug.Log($"PlayerDataItem clicked: {playerId}");
+        DialogManager dialogManager = DialogManager.Instance;
+
+        Faction faction = StateManager.Instance.GetFactionById(StateManager.Instance.GetPlayerById(playerId)?.FactionId);
+        dialogManager.ShowFactionDialog(faction?.Name ?? "미정", faction?.Description ?? "설명 없음", () =>
+        {
+            dialogManager.CloseTopDialog();
+        });
     }
 }

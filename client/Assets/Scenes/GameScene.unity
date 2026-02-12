@@ -604,7 +604,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ddfe9048b4a55d4384867bce985184c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StateManager
-  currentUIState: 0
+  currentUIState: 1
 --- !u!4 &443667638
 Transform:
   m_ObjectHideFlags: 0
@@ -2355,7 +2355,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1516230023
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2957,6 +2957,7 @@ MonoBehaviour:
   dialogContainer: {fileID: 1222860549}
   createGameDialogPrefab: {fileID: 7800550403556056558, guid: b198b1474f430034c8bbdbd074df4dde, type: 3}
   joinGameDialogPrefab: {fileID: 7408711471061630097, guid: 0123e80edcb91f546bac58d9a2e7da29, type: 3}
+  factionDialogPrefab: {fileID: 685665648982774487, guid: 39096bb13ab2c3e4289dd8c89ebc8f88, type: 3}
 --- !u!4 &2081528276
 Transform:
   m_ObjectHideFlags: 0

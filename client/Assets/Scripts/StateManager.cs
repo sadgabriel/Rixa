@@ -110,7 +110,7 @@ public class StateManager : MonoBehaviour
 
     public Player GetPlayerById(string playerId)
     {
-        if (CurrentGameState == null || CurrentGameState.Players == null)
+        if (playerId == null ||CurrentGameState == null || CurrentGameState.Players == null)
         {
             return null;
         }
@@ -119,7 +119,7 @@ public class StateManager : MonoBehaviour
 
     public Faction GetFactionById(string factionId)
     {
-        if (CurrentGameState == null || CurrentGameState.Factions == null)
+        if (factionId == null || CurrentGameState == null || CurrentGameState.Factions == null)
         {
             return null;
         }
