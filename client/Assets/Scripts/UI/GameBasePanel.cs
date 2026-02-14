@@ -40,7 +40,7 @@ public class GameBasePanel : PersistentPanel
     {
         ClearPlayerData();
 
-        GameState gameState = StateManager.Instance.CurrentGameState;
+        GameState gameState = stateManager.CurrentGameState;
         if (gameState?.Players == null) return;
 
         for (int i = 0; i < gameState.Players.Count; i++)
