@@ -604,7 +604,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ddfe9048b4a55d4384867bce985184c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StateManager
-  currentUIState: 1
 --- !u!4 &443667638
 Transform:
   m_ObjectHideFlags: 0
@@ -1503,8 +1502,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppLobbyPanel
   panelState: 2
-  panelContext: 0
-  isPersistent: 0
   gameRoomItemPrefab: {fileID: 2657581897099044013, guid: de0b12cf764abe64b9934282f3c05e15, type: 3}
   contentParent: {fileID: 922788869}
   createGameButton: {fileID: 1225549252}
@@ -2429,9 +2426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c5eee27f8e2c84faf5e8c4145eabc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameBasePanel
-  panelState: 0
   panelContext: 1
-  isPersistent: 1
   playerDataLeftContainer: {fileID: 566037758}
   playerDataRightContainer: {fileID: 1442831685}
   inputField: {fileID: 1919811572}

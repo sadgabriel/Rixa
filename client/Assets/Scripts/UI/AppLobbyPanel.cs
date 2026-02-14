@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AppLobbyPanel : Panel
+public class AppLobbyPanel : NonPersistentPanel
 {
     [SerializeField] private GameObject gameRoomItemPrefab;
     [SerializeField] private Transform contentParent;
@@ -17,12 +16,12 @@ public class AppLobbyPanel : Panel
     {
         joinGameButton.interactable = false;
         RefreshLobbyList();
-        stateManager.OnUIStateUpdated += HandleUIStateUpdated;
+        stateManager.OnLobbyStateUpdated += HandleLobbyStateUpdated;
     }
     
     private void OnDisable()
     {
-        stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
+        stateManager.OnLobbyStateUpdated -= HandleLobbyStateUpdated;
         ClearRoomList();
     }
 
@@ -65,9 +64,8 @@ public class AppLobbyPanel : Panel
         activeRoomItems.Clear();
     }
 
-    private void HandleUIStateUpdated(UIState newState)
+    private void HandleLobbyStateUpdated(LobbyState _)
     {
-        if (newState != PanelState) return;
         RefreshLobbyList();
     }
 

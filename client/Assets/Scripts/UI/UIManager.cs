@@ -19,15 +19,14 @@ public class UIManager : MonoBehaviour
 
     private StateManager stateManager;
 
-    private Dictionary<UIState, Panel> statePanels = new Dictionary<UIState, Panel>();
-    private Dictionary<UIContext, List<Panel>> persistentPanels = new Dictionary<UIContext, List<Panel>>()
+    private Dictionary<UIState, NonPersistentPanel> nonPersistentPanels = new Dictionary<UIState, NonPersistentPanel>();
+    private Dictionary<UIContext, List<PersistentPanel>> persistentPanels = new Dictionary<UIContext, List<PersistentPanel>>()
     {
-        { UIContext.App, new List<Panel>() },
-        { UIContext.Game, new List<Panel>() }
+        { UIContext.App, new List<PersistentPanel>() },
+        { UIContext.Game, new List<PersistentPanel>() }
     };
 
     private UIContext currentContext = UIContext.App;
-
     private UIState currentState = UIState.IDLE;
     
 
@@ -49,13 +48,13 @@ public class UIManager : MonoBehaviour
         {
             panel.Hide();
 
-            if (panel.IsPersistent)
+            if (panel is PersistentPanel persistentPanel)
             {
-                UIContext context = panel.PanelContext;
-                persistentPanels[context].Add(panel);
-            } else
+                UIContext context = persistentPanel.PanelContext;
+                persistentPanels[context].Add(persistentPanel);
+            } else if (panel is NonPersistentPanel nonPersistentPanel)
             {
-                statePanels[panel.PanelState] = panel;
+                nonPersistentPanels[nonPersistentPanel.PanelState] = nonPersistentPanel;
             }
         }
 
@@ -65,7 +64,10 @@ public class UIManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
+        if (stateManager != null)
+        {
+            stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
+        }
 
         if (instance == this)
         {
@@ -75,13 +77,14 @@ public class UIManager : MonoBehaviour
 
     private void HandleUIStateUpdated(UIState nextState)
     {
-        Debug.Log($"UIManager: Transitioning from {currentState} to {nextState}");
+        Debug.Log($"[UIManager] UIState updated: {currentState} → {nextState}");
         if (nextState == currentState) return;
 
         UIContext nextContext = GetContext(nextState);
 
         if (nextContext != currentContext)
         {
+            Debug.Log($"[UIManager] Context changed: {currentContext} → {nextContext}");
             foreach (Panel panel in persistentPanels[currentContext])
             {
                 panel.Hide();
@@ -92,14 +95,18 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        if (statePanels.TryGetValue(currentState, out var oldPanel))
+        if (nonPersistentPanels.TryGetValue(currentState, out var oldPanel))
         {
             oldPanel.Hide();
         }
 
-        if (statePanels.TryGetValue(nextState, out var newPanel))
+        if (nonPersistentPanels.TryGetValue(nextState, out var newPanel))
         {
             newPanel.Show();
+        }
+        else if (nextState != UIState.IDLE && nextState != UIState.None)
+        {
+            Debug.LogWarning($"[UIManager] No panel registered for state: {nextState}");
         }
 
         currentContext = nextContext;
@@ -108,13 +115,18 @@ public class UIManager : MonoBehaviour
 
     private UIContext GetContext(UIState state)
     {
-        if (state == UIState.IDLE || state == UIState.APP_LOBBY)
+        switch (state)
         {
-            return UIContext.App;
-        } 
-        else
-        {
-            return UIContext.Game;
+            case UIState.IDLE:
+            case UIState.APP_LOBBY:
+                return UIContext.App;
+            
+            case UIState.None:
+                Debug.LogWarning($"[UIManager] UIState.None has no context");
+                return UIContext.App;
+            
+            default:
+                return UIContext.Game;
         }
     }
 }

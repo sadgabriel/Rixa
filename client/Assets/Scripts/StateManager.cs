@@ -46,6 +46,9 @@ public class StateManager : MonoBehaviour
     private UIState currentUIState = UIState.IDLE;
     
     public event Action<UIState> OnUIStateUpdated;
+    public event Action<ClientState> OnClientStateUpdated;
+    public event Action<LobbyState> OnLobbyStateUpdated;
+    public event Action<GameState> OnGameStateUpdated;
 
     public ClientState CurrentClientState
     {
@@ -225,17 +228,20 @@ public class StateManager : MonoBehaviour
     {
         CurrentClientState = state;
         RecomputeUIState();
+        OnClientStateUpdated?.Invoke(state);
     }
 
     private void HandleLobbyStateUpdated(LobbyState state)
     {
         CurrentLobbyState = state;
         RecomputeUIState();
+        OnLobbyStateUpdated?.Invoke(state);
     }
 
     private void HandleGameStateUpdated(GameState state)
     {
         CurrentGameState = state;
         RecomputeUIState();
+        OnGameStateUpdated?.Invoke(state);
     }
 }

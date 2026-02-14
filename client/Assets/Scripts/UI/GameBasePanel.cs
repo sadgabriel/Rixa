@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class GameBasePanel : Panel
+public class GameBasePanel : PersistentPanel
 {
     [SerializeField] private Transform playerDataLeftContainer;
     [SerializeField] private Transform playerDataRightContainer;
@@ -17,18 +17,17 @@ public class GameBasePanel : Panel
     private void OnEnable()
     {
         RefreshPlayerData();
-        stateManager.OnUIStateUpdated += HandleUIStateUpdated;
+        stateManager.OnGameStateUpdated += HandleGameStateUpdated;
     }
 
     private void OnDisable()
     {
-        stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
+        stateManager.OnGameStateUpdated -= HandleGameStateUpdated;
         ClearPlayerData();
     }
 
-    private void HandleUIStateUpdated(UIState newState)
+    private void HandleGameStateUpdated(GameState gameState)
     {
-        GameState gameState = StateManager.Instance.CurrentGameState;
         if (gameState?.Players == null) return;
 
         if (gameState.Players.Count != playerDataItems.Count)
