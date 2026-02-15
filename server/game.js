@@ -120,17 +120,13 @@ export class Game {
         const player = this.getPlayer(playerId);
         player.ready = ready;
 
-        if (this.players.every(p => p.ready)){
+        if (this.players.every(p => p.ready) && this.players.length > 1) {
             this.gameStart();
         }
     }
 
     gameStart() {
         this._checkPhase(GamePhase.LOBBY);
-
-        if (this.players.length < 2) {
-            throw new Errors.NotEnoughPlayersError(this.players.length);
-        }
 
         if (!this.players.every(p => p.ready)){
             throw new Errors.PlayersNotReadyError();

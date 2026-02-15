@@ -17,12 +17,20 @@ public class GameBasePanel : PersistentPanel
     private void OnEnable()
     {
         RefreshPlayerData();
+
+        if (stateManager != null)
+        {
+            ConfigureMainButton(stateManager.CurrentUIState);
+        }
+
         stateManager.OnGameStateUpdated += HandleGameStateUpdated;
+        stateManager.OnUIStateUpdated += HandleUIStateUpdated;
     }
 
     private void OnDisable()
     {
         stateManager.OnGameStateUpdated -= HandleGameStateUpdated;
+        stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
         ClearPlayerData();
     }
 
@@ -62,5 +70,45 @@ public class GameBasePanel : PersistentPanel
             Destroy(item.gameObject);
         }
         playerDataItems.Clear();
+    }
+
+    private void HandleUIStateUpdated(UIState newState)
+    {
+        ConfigureMainButton(newState);
+    }
+
+    private void ConfigureMainButton(UIState state)
+    {
+        switch (state)
+        {
+            case UIState.GAME_LOBBY:
+                SetupReadyButton();
+                break;
+            default:
+                mainButton.gameObject.SetActive(false);
+                break;
+        }
+    }
+
+    private void SetupReadyButton()
+    {
+        mainButton.gameObject.SetActive(true);
+        
+        mainButton.onClick.RemoveAllListeners();
+        
+        Player myPlayer = stateManager.MyPlayer;
+        bool isReady = myPlayer?.Ready ?? false;
+        
+        var buttonText = mainButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        buttonText.text = isReady ? "준비 취소" : "준비";
+
+        mainButton.onClick.AddListener(OnReadyButtonClicked);
+    }
+    private void OnReadyButtonClicked()
+    {
+        Player myPlayer = stateManager.MyPlayer;
+        bool isReady = myPlayer?.Ready ?? false;
+        
+        gameClient.SetReady(!isReady);
     }
 }

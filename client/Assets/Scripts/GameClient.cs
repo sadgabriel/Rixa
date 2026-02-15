@@ -38,6 +38,7 @@ public class GameClient : MonoBehaviour
 
         wsClient = WsClient.Instance;
         wsClient.OnMessage += HandleMessage;
+        wsClient.OnError += HandleError;
     }
 
     private void OnDestroy()
@@ -168,6 +169,11 @@ public class GameClient : MonoBehaviour
         return true;
     }
 
+    private void HandleError(string errorMessage)
+    {
+        Debug.LogWarning($"Server error: {errorMessage}");
+    }
+
     private void HandleMessage(string type, JToken data)
     {
         Debug.Log($"[GameClient] Received: {type}");
@@ -187,6 +193,9 @@ public class GameClient : MonoBehaviour
                     break;
                 case "game.state":
                     HandleGameStateMessage(data);
+                    break;
+                case "error":
+                    HandleError(data.ToString());
                     break;
                 default:
                     Debug.LogWarning($"Unknown message type: {type}");

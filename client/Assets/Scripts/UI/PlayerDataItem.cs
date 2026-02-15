@@ -6,6 +6,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
     [SerializeField] private TMPro.TextMeshProUGUI playerNameText;
     [SerializeField] private TMPro.TextMeshProUGUI factionNameText;
     [SerializeField] private TMPro.TextMeshProUGUI scoreText;
+    [SerializeField] private StatusIndicator statusIndicator;
 
     private string playerId;
     private StateManager stateManager;
@@ -50,6 +51,15 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         Player player = stateManager.GetPlayerById(playerId);
         if (player == null) return;
         playerNameText.text = player.Name;
+
+        if (player.Ready)
+        {
+            statusIndicator.ShowReady();
+        }
+        else
+        {
+            statusIndicator.Hide();
+        }
 
         Faction faction = stateManager.GetFactionById(player.FactionId);
         if (faction == null) return;
