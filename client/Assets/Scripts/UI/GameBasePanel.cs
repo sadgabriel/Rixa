@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Runtime.CompilerServices;
 
 public class GameBasePanel : PersistentPanel
 {
@@ -84,6 +85,9 @@ public class GameBasePanel : PersistentPanel
             case UIState.GAME_LOBBY:
                 SetupReadyButton();
                 break;
+            case UIState.GAME_CONTEXT_INPUT:
+                SetupSubmitContextButton();
+                break;
             default:
                 mainButton.gameObject.SetActive(false);
                 break;
@@ -93,7 +97,6 @@ public class GameBasePanel : PersistentPanel
     private void SetupReadyButton()
     {
         mainButton.gameObject.SetActive(true);
-        
         mainButton.onClick.RemoveAllListeners();
         
         Player myPlayer = stateManager.MyPlayer;
@@ -110,5 +113,28 @@ public class GameBasePanel : PersistentPanel
         bool isReady = myPlayer?.Ready ?? false;
         
         gameClient.SetReady(!isReady);
+    }
+
+    private void SetupSubmitContextButton()
+    {
+        mainButton.gameObject.SetActive(true);
+        mainButton.onClick.RemoveAllListeners();
+
+        var buttonText = mainButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        buttonText.text = "제출";
+
+        mainButton.onClick.AddListener(OnSubmitContextButtonClicked);
+    }
+
+    private void OnSubmitContextButtonClicked()
+    {
+        string context = inputField.text.Trim();
+        if (string.IsNullOrEmpty(context))
+        {
+            Debug.LogWarning("Context input is empty");
+            return;
+        }
+
+        gameClient.SubmitContext(context);
     }
 }

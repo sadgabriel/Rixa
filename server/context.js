@@ -1,7 +1,7 @@
 export function createContext() {
     return { 
-        rawContextDescription: "",
-        description: "",
+        rawContextDescription: null,
+        description: null,
         eventLog: []
     }
 }

@@ -120,6 +120,9 @@ public class GameState
     [JsonProperty("players")]
     public List<Player> Players { get; set; }
 
+    [JsonProperty("leadPlayerId")]
+    public string LeadPlayerId { get; set; }
+
     [JsonProperty("factions")]
     public List<Faction> Factions { get; set; }
 

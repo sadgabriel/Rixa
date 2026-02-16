@@ -201,6 +201,7 @@ GameObject:
   - component: {fileID: 5220807483554808336}
   - component: {fileID: 7134820785094483038}
   - component: {fileID: 6338960429879899841}
+  - component: {fileID: 8129550750866955251}
   m_Layer: 5
   m_Name: GameNameInputField
   m_TagString: Untagged
@@ -367,6 +368,19 @@ MonoBehaviour:
   isAlert: 0
   m_InputValidator: {fileID: 0}
   m_ShouldActivateOnSelect: 1
+--- !u!114 &8129550750866955251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 217004325662755450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: WebGLInput::WebGLSupport.WebGLInput
+  showHtmlElement: 0
 --- !u!1 &2828607318951420686
 GameObject:
   m_ObjectHideFlags: 0
@@ -1235,6 +1249,7 @@ GameObject:
   - component: {fileID: 4674191873963461651}
   - component: {fileID: 7185438877927816035}
   - component: {fileID: 5926909151544340151}
+  - component: {fileID: 2895446288913620923}
   m_Layer: 5
   m_Name: PlayerNameInputField
   m_TagString: Untagged
@@ -1401,6 +1416,19 @@ MonoBehaviour:
   isAlert: 0
   m_InputValidator: {fileID: 0}
   m_ShouldActivateOnSelect: 1
+--- !u!114 &2895446288913620923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5907822708019432867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: WebGLInput::WebGLSupport.WebGLInput
+  showHtmlElement: 0
 --- !u!1 &6525664597664095174
 GameObject:
   m_ObjectHideFlags: 0

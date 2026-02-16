@@ -52,7 +52,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         if (player == null) return;
         playerNameText.text = player.Name;
 
-        if (player.Ready)
+        if (stateManager.CurrentUIState == UIState.GAME_LOBBY && player.Ready)
         {
             statusIndicator.ShowReady();
         }
