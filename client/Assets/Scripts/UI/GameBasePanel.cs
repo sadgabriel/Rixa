@@ -76,36 +76,55 @@ public class GameBasePanel : PersistentPanel
     private void HandleUIStateUpdated(UIState newState)
     {
         ConfigureMainButton(newState);
+        ConfigureInputField(newState);
     }
 
     private void ConfigureMainButton(UIState state)
     {
+        mainButton.interactable = true;
+        mainButton.onClick.RemoveAllListeners();
+        var buttonText = mainButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        buttonText.text = "제출";
         switch (state)
         {
             case UIState.GAME_LOBBY:
-                SetupReadyButton();
+                Player myPlayer = stateManager.MyPlayer;
+                bool isReady = myPlayer?.Ready ?? false;
+                buttonText.text = isReady ? "준비 취소" : "준비";
+                mainButton.onClick.AddListener(OnReadyButtonClicked);
                 break;
             case UIState.GAME_CONTEXT_INPUT:
-                SetupSubmitContextButton();
+                if (!stateManager.IsLeader())
+                {
+                    mainButton.interactable = false;
+                }
+                mainButton.onClick.AddListener(OnSubmitContextButtonClicked);
                 break;
             default:
-                mainButton.gameObject.SetActive(false);
+                mainButton.interactable = false;
                 break;
         }
     }
 
-    private void SetupReadyButton()
+    private void ConfigureInputField(UIState state)
     {
-        mainButton.gameObject.SetActive(true);
-        mainButton.onClick.RemoveAllListeners();
-        
-        Player myPlayer = stateManager.MyPlayer;
-        bool isReady = myPlayer?.Ready ?? false;
-        
-        var buttonText = mainButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-        buttonText.text = isReady ? "준비 취소" : "준비";
+        inputField.interactable = true;
+        inputField.text = string.Empty;
 
-        mainButton.onClick.AddListener(OnReadyButtonClicked);
+        switch (state)
+        {
+            case UIState.GAME_LOBBY:
+                inputField.interactable = false;
+                break;
+            case UIState.GAME_CONTEXT_INPUT:
+                if (!stateManager.IsLeader())
+                {
+                    inputField.interactable = false;
+                }
+                break;
+            default:
+                break;
+        }
     }
     private void OnReadyButtonClicked()
     {
@@ -113,17 +132,6 @@ public class GameBasePanel : PersistentPanel
         bool isReady = myPlayer?.Ready ?? false;
         
         gameClient.SetReady(!isReady);
-    }
-
-    private void SetupSubmitContextButton()
-    {
-        mainButton.gameObject.SetActive(true);
-        mainButton.onClick.RemoveAllListeners();
-
-        var buttonText = mainButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-        buttonText.text = "제출";
-
-        mainButton.onClick.AddListener(OnSubmitContextButtonClicked);
     }
 
     private void OnSubmitContextButtonClicked()

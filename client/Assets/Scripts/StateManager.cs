@@ -131,6 +131,21 @@ public class StateManager : MonoBehaviour
         return true;
     }
 
+    public bool IsLeader()
+    {
+        if (!IsInGame())
+        {
+            return false;
+        }
+
+        if (MyPlayer?.Id == null || currentGameState?.LeadPlayerId == null || currentGameState.LeadPlayerId != MyPlayer.Id)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public Player GetPlayerById(string playerId)
     {
         if (playerId == null ||CurrentGameState == null || CurrentGameState.Players == null)
