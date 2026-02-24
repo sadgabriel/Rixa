@@ -63,7 +63,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
 
         Faction faction = stateManager.GetFactionById(player.FactionId);
         if (faction == null) return;
-        factionNameText.text = faction.Name;
+        factionNameText.text = string.IsNullOrEmpty(faction.Name) ? "미정" : faction.Name;
         scoreText.text = $"점수: {faction.Score}";
     }
 

@@ -128,4 +128,7 @@ public class GameState
 
     [JsonProperty("matches")]
     public List<Match> Matches { get; set; }
+
+    [JsonProperty("setupOffset")]
+    public int SetupOffset { get; set; }
 }

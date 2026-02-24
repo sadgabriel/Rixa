@@ -45,7 +45,7 @@ public class StateManager : MonoBehaviour
     private GameState currentGameState = null;
     [SerializeField] private UIState currentUIState = UIState.IDLE;
     
-    public event Action<UIState> OnUIStateUpdated;
+    public event Action<UIState, bool> OnUIStateUpdated;
     public event Action<ClientState> OnClientStateUpdated;
     public event Action<LobbyState> OnLobbyStateUpdated;
     public event Action<GameState> OnGameStateUpdated;
@@ -73,8 +73,9 @@ public class StateManager : MonoBehaviour
         get { return currentUIState; }
         private set
         {
+            UIState oldState = currentUIState;
             currentUIState = value;
-            OnUIStateUpdated?.Invoke(currentUIState);
+            OnUIStateUpdated?.Invoke(currentUIState, oldState != currentUIState);
         }
     }
 
@@ -93,6 +94,25 @@ public class StateManager : MonoBehaviour
             }
             
             return currentGameState.Players.Find(p => p.Id == currentClientState.PlayerId);
+        }
+    }
+
+    public Faction MyFaction
+    {
+        get
+        {
+            Player me = MyPlayer;
+            if (me == null || string.IsNullOrEmpty(me.FactionId))
+            {
+                return null;
+            }
+            
+            if (currentGameState?.Factions == null)
+            {
+                return null;
+            }
+            
+            return currentGameState.Factions.Find(f => f.Id == me.FactionId);
         }
     }
 

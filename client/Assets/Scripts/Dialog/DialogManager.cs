@@ -24,6 +24,7 @@ public class DialogManager : MonoBehaviour
     [SerializeField] private GameObject createGameDialogPrefab;
     [SerializeField] private GameObject joinGameDialogPrefab;
     [SerializeField] private GameObject factionDialogPrefab;
+    [SerializeField] private GameObject factionNameInputDialogPrefab;
 
     private Stack<GameObject> dialogStack = new Stack<GameObject>();
 
@@ -80,6 +81,13 @@ public class DialogManager : MonoBehaviour
         FactionDialog factionDialog = dialogGO.GetComponent<FactionDialog>();
         factionDialog?.SetFactionInfo(factionName, factionDescription);
         factionDialog?.SetOnCloseButtonClickedCallback(onClose);
+    }
+
+    public void ShowFactionNameInputDialog(Action<string> onConfirm, Action onCancel = null)
+    {
+        GameObject dialogGO = ShowDialog(factionNameInputDialogPrefab);
+        FactionNameInputDialog factionNameInputDialog = dialogGO.GetComponent<FactionNameInputDialog>();
+        factionNameInputDialog?.SetCallbacks(onConfirm, onCancel);
     }
 
     private GameObject ShowDialog(GameObject dialogPrefab)

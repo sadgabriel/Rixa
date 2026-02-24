@@ -282,7 +282,8 @@ function formGameState(game) {
         players: game.players,
         leadPlayerId: game.playerCycle.length > 0 ? game.playerCycle[0].id : null,
         factions: game.factions,
-        matches: game.matches
+        matches: game.matches,
+        setupOffset: game.setupOffset,
     }
 }
 

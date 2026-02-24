@@ -35,6 +35,7 @@ export class Game {
         this.context = createContext();
         this.roundOffsets = [];
         this.playerCycle = [];
+        this.setupOffset = 0;
     }
 
     _checkPhase(required) {
@@ -136,6 +137,7 @@ export class Game {
         this._createFactions();
         this.playerCycle = shuffle(this.players);
         this._generateRoundOffsets();
+        this.setupOffset = Math.floor(Math.random() * (this.players.length - 1)) + 1;
         this._createMatches();
 
         this.phase = GamePhase.CONTEXT_INPUT;
@@ -197,6 +199,7 @@ export class Game {
 
     async setupContext() {
         this._checkPhase(GamePhase.CONTEXT_SETUP);
+        console.log("Setting up context with judge...");
 
         const output = await this.judge.setupContext(this.context, this.factions);
 
@@ -209,6 +212,7 @@ export class Game {
                 resource.count = MAX_RESOURCE;
             }
         }
+        console.log("Context setup complete.");
 
         this.phase = GamePhase.ATTACK;
     }

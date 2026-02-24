@@ -75,10 +75,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void HandleUIStateUpdated(UIState nextState)
+    private void HandleUIStateUpdated(UIState nextState, bool stateChanged)
     {
         Debug.Log($"[UIManager] UIState updated: {currentState} → {nextState}");
-        if (nextState == currentState) return;
+        if (!stateChanged) return;
 
         UIContext nextContext = GetContext(nextState);
 
