@@ -123,11 +123,12 @@ public class GameClient : MonoBehaviour
         });
     }
 
-    public void SubmitFactionFlaw(string factionFlawDescription)
+    public void SubmitFactionFlaw(string factionId, string factionFlawDescription)
     {
         if (!IsConnected()) return;
         Submit("factionFlaw", new
         {
+            factionId,
             factionFlawDescription
         });
     }

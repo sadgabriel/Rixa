@@ -124,7 +124,8 @@ public class GameBasePanel : PersistentPanel
                     }
                     break;
                 case UIState.GAME_FACTION_FLAW_INPUT:
-                    if (myFaction != null && !string.IsNullOrEmpty(myFaction.RawFlaw))
+                    Faction anotherFaction = stateManager.AnotherFaction;
+                    if (anotherFaction != null && !string.IsNullOrEmpty(anotherFaction.RawFlaw))
                     {
                         mainButton.interactable = false;
                     }
@@ -168,9 +169,10 @@ public class GameBasePanel : PersistentPanel
                     }
                     break;
                 case UIState.GAME_FACTION_FLAW_INPUT:
-                    if (myFaction != null && !string.IsNullOrEmpty(myFaction.RawFlaw))
+                    Faction anotherFaction = stateManager.AnotherFaction;
+                    if (anotherFaction != null && !string.IsNullOrEmpty(anotherFaction.RawFlaw))
                     {
-                        inputField.text = myFaction.RawFlaw;
+                        inputField.text = anotherFaction.RawFlaw;
                         inputField.interactable = false;
                     }
                     break;
@@ -234,6 +236,6 @@ public class GameBasePanel : PersistentPanel
             return;
         }
 
-        gameClient.SubmitFactionFlaw(flaw);
+        gameClient.SubmitFactionFlaw(stateManager.AnotherFaction.Id, flaw);
     }
 }

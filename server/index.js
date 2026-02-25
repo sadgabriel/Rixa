@@ -214,7 +214,7 @@ async function handleGameSubmit(client, data) {
             game.submitFactionConceptAndName(factionId, payload.factionConceptDescription, payload.factionName);
             break;
         case "factionFlaw":
-            factionId = game.getFactionByPlayerId(client.playerId).id;
+            factionId = payload.factionId;
             game.submitFactionFlaw(factionId, payload.factionFlawDescription);
             
             if (game.phase === GamePhase.CONTEXT_SETUP){

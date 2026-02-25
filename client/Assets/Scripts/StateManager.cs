@@ -116,6 +116,32 @@ public class StateManager : MonoBehaviour
         }
     }
 
+    public Faction AnotherFaction
+    {
+        get
+        {
+            if (!IsInGame() || currentGameState.Players == null || currentGameState.Factions == null || currentGameState.SetupOffset == 0)
+            {
+                return null;
+            }
+
+            int myIndex = 0;
+            while (myIndex < currentGameState.Players.Count && currentGameState.Players[myIndex].Id != MyPlayer.Id)
+            {
+                myIndex++;
+            }
+
+            if (myIndex < currentGameState.Players.Count)
+            {
+                int anotherIndex = (myIndex + currentGameState.SetupOffset) % currentGameState.Players.Count;
+                Faction anotherFaction = GetFactionById(currentGameState.Players[anotherIndex].FactionId);
+                return anotherFaction;
+            }
+
+            return null;
+        }
+    }
+
     public bool IsInGame()
     {
         if (currentClientState == null || string.IsNullOrEmpty(currentClientState.GameId))
