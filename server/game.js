@@ -12,10 +12,12 @@ export const GamePhase = Object.freeze({
     FACTION_CONCEPT_INPUT: 'faction_concept_input',
     FACTION_FLAW_INPUT: 'faction_flaw_input',
     CONTEXT_SETUP: 'context_setup',
+    CONTEXT_SETUP_DISPLAY: 'context_setup_display',
     ATTACK: 'attack',
     DEFENSE: 'defense',
     COMPETITION_ANALYZE: 'competition_analyze',
     COMPETITION_NARRATE: 'competition_narrate',
+    COMPETITION_DISPLAY: 'competition_display',
     END: 'end',
 });
 
@@ -214,6 +216,11 @@ export class Game {
         }
         console.log("Context setup complete.");
 
+        this.phase = GamePhase.CONTEXT_SETUP_DISPLAY;
+    }
+
+    endContextSetupDisplay() {
+        this._checkPhase(GamePhase.CONTEXT_SETUP_DISPLAY);
         this.phase = GamePhase.ATTACK;
     }
 
@@ -362,6 +369,11 @@ export class Game {
             match.displayNarrative = matchNarration.display_narrative;
         }
 
+        this.phase = GamePhase.COMPETITION_DISPLAY;
+    }
+
+    endCompetitionDisplay() {
+        this._checkPhase(GamePhase.COMPETITION_DISPLAY);
         if (this.round >= TOTAL_ROUNDS) {
             this.phase = GamePhase.END;
         } else {

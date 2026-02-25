@@ -13,6 +13,10 @@ const idToClientMap = new Map();
 const socketToClientMap = new Map();
 const idToGameMap = new Map();
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 wss.on('connection', (ws) => {
     const client = new Client(ws);
     idToClientMap.set(client.id, client);
@@ -220,6 +224,9 @@ async function handleGameSubmit(client, data) {
             if (game.phase === GamePhase.CONTEXT_SETUP){
                 broadcastGameState(game);
                 await game.setupContext();
+                broadcastGameState(game);
+                await sleep(5000);
+                game.endContextSetupDisplay();
             }
             break;
         case "attack":
@@ -236,6 +243,10 @@ async function handleGameSubmit(client, data) {
 
                 broadcastGameState(game);
                 await game.narrateCompetition();
+
+                broadcastGameState(game);
+                await sleep(5000);
+                game.endCompetitionDisplay();
             }
             break;
     }
