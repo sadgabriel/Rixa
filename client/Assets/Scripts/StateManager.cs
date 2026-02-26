@@ -15,11 +15,13 @@ public enum UIState
     GAME_FACTION_FLAW_INPUT,
 
     GAME_CONTEXT_SETUP,
+    GAME_CONTEXT_SETUP_FINISH,
     GAME_ATTACK,
     GAME_DEFENSE,
 
     GAME_COMPETITION_ANALYZE,
     GAME_COMPETITION_NARRATE,
+    GAME_COMPETITION_FINISH,
 
     GAME_END,
 }
@@ -253,10 +255,12 @@ public class StateManager : MonoBehaviour
             case "faction_concept_input": return UIState.GAME_FACTION_CONCEPT_INPUT;
             case "faction_flaw_input": return UIState.GAME_FACTION_FLAW_INPUT;
             case "context_setup": return UIState.GAME_CONTEXT_SETUP;
+            case "context_setup_finish": return UIState.GAME_CONTEXT_SETUP_FINISH;
             case "attack": return UIState.GAME_ATTACK;
             case "defense": return UIState.GAME_DEFENSE;
             case "competition_analyze": return UIState.GAME_COMPETITION_ANALYZE;
             case "competition_narrate": return UIState.GAME_COMPETITION_NARRATE;
+            case "competition_finish": return UIState.GAME_COMPETITION_FINISH;
             case "end": return UIState.GAME_END;
             default: return UIState.GAME_LOBBY;
         }

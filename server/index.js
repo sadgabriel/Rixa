@@ -226,7 +226,7 @@ async function handleGameSubmit(client, data) {
                 await game.setupContext();
                 broadcastGameState(game);
                 await sleep(5000);
-                game.endContextSetupDisplay();
+                    game.endContextSetupFinish();
             }
             break;
         case "attack":
@@ -246,7 +246,7 @@ async function handleGameSubmit(client, data) {
 
                 broadcastGameState(game);
                 await sleep(5000);
-                game.endCompetitionDisplay();
+                game.endCompetitionFinish();
             }
             break;
     }
