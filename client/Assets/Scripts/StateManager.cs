@@ -144,6 +144,44 @@ public class StateManager : MonoBehaviour
         }
     }
 
+    public Match MyAttackMatch
+    {
+        get
+        {
+            if (!IsInGame() || currentGameState.Matches == null)
+            {
+                return null;
+            }
+
+            Faction myFaction = MyFaction;
+            if (myFaction == null)
+            {
+                return null;
+            }
+
+            return currentGameState.Matches.Find(m => m.AttackerId == myFaction.Id);
+        }
+    }
+
+    public Match MyDefenseMatch
+    {
+        get
+        {
+            if (!IsInGame() || currentGameState.Matches == null)
+            {
+                return null;
+            }
+
+            Faction myFaction = MyFaction;
+            if (myFaction == null)
+            {
+                return null;
+            }
+
+            return currentGameState.Matches.Find(m => m.DefenderId == myFaction.Id);
+        }
+    }
+
     public bool IsInGame()
     {
         if (currentClientState == null || string.IsNullOrEmpty(currentClientState.GameId))
@@ -210,6 +248,16 @@ public class StateManager : MonoBehaviour
             return null;
         }
         return CurrentGameState.Factions.Find(f => f.Id == factionId);
+    }
+
+    public Player GetPlayerByFactionId(string factionId)
+    {
+        if (!IsInGame() || factionId == null)
+        {
+            return null;
+        }
+
+        return CurrentGameState.Players.Find(p => p.FactionId == factionId);
     }
 
     private void Awake()

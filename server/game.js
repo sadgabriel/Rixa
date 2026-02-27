@@ -290,8 +290,11 @@ export class Game {
 
     async analyzeCompetition() {
         this._checkPhase(GamePhase.COMPETITION_ANALYZE);
+        console.log("Analyzing competition with judge...");
 
         const output = await this.judge.analyzeCompetition(this.context, this.factions, this.matches);
+
+        console.log("Competition analysis complete.");
 
         for (const matchAnalysis of output.analysis_results) {
             const match = this.getMatch(matchAnalysis.match_id);
@@ -360,7 +363,9 @@ export class Game {
     async narrateCompetition() {
         this._checkPhase(GamePhase.COMPETITION_NARRATE);
 
+        console.log("Narrating competition with judge...");
         const output = await this.judge.narrateCompetition(this.context, this.factions, this.matches);
+        console.log("Competition narration complete.");
 
         this.context.eventLog.push(output.context_log);
 

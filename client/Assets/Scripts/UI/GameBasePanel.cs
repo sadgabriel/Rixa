@@ -82,6 +82,8 @@ public class GameBasePanel : PersistentPanel
     private void ConfigureMainButton(UIState state, bool stateChanged = true)
     {
         Faction myFaction = stateManager.MyFaction;
+        Match myAttackMatch = stateManager.MyAttackMatch;
+        Match myDefenseMatch = stateManager.MyDefenseMatch;
         var buttonText = mainButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         if (stateChanged)
         {
@@ -109,6 +111,12 @@ public class GameBasePanel : PersistentPanel
                 case UIState.GAME_FACTION_FLAW_INPUT:
                     mainButton.onClick.AddListener(OnSubmitFactionFlawButtonClicked);
                     break;
+                case UIState.GAME_ATTACK:
+                    mainButton.onClick.AddListener(OnSubmitAttackButtonClicked);
+                    break;
+                case UIState.GAME_DEFENSE:
+                    mainButton.onClick.AddListener(OnSubmitDefenseButtonClicked);
+                    break;
                 default:
                     mainButton.interactable = false;
                     break;
@@ -130,6 +138,18 @@ public class GameBasePanel : PersistentPanel
                         mainButton.interactable = false;
                     }
                     break;
+                case UIState.GAME_ATTACK:
+                    if (myAttackMatch != null && !string.IsNullOrEmpty(myAttackMatch.AttackDescription))
+                    {
+                        mainButton.interactable = false;
+                    }
+                    break;
+                case UIState.GAME_DEFENSE:
+                    if (myDefenseMatch != null && !string.IsNullOrEmpty(myDefenseMatch.DefenseDescription))
+                    {
+                        mainButton.interactable = false;
+                    }
+                    break;
                 
             }
         }
@@ -138,6 +158,8 @@ public class GameBasePanel : PersistentPanel
     private void ConfigureInputField(UIState state, bool stateChanged = true)
     {
         Faction myFaction = stateManager.MyFaction;
+        Match myAttackMatch = stateManager.MyAttackMatch;
+        Match myDefenseMatch = stateManager.MyDefenseMatch;
         if (stateChanged)
         {
             inputField.interactable = true;
@@ -153,6 +175,12 @@ public class GameBasePanel : PersistentPanel
                     {
                         inputField.interactable = false;
                     }
+                    break;
+                case UIState.GAME_CONTEXT_SETUP:
+                    inputField.interactable = false;
+                    break;
+                case UIState.GAME_CONTEXT_SETUP_FINISH:
+                    inputField.interactable = false;
                     break;
                 default:
                     break;
@@ -173,6 +201,20 @@ public class GameBasePanel : PersistentPanel
                     if (anotherFaction != null && !string.IsNullOrEmpty(anotherFaction.RawFlaw))
                     {
                         inputField.text = anotherFaction.RawFlaw;
+                        inputField.interactable = false;
+                    }
+                    break;
+                case UIState.GAME_ATTACK:
+                    if (myAttackMatch != null && !string.IsNullOrEmpty(myAttackMatch.AttackDescription))
+                    {
+                        inputField.text = myAttackMatch.AttackDescription;
+                        inputField.interactable = false;
+                    }
+                    break;
+                case UIState.GAME_DEFENSE:
+                    if (myDefenseMatch != null && !string.IsNullOrEmpty(myDefenseMatch.DefenseDescription))
+                    {
+                        inputField.text = myDefenseMatch.DefenseDescription;
                         inputField.interactable = false;
                     }
                     break;
@@ -237,5 +279,27 @@ public class GameBasePanel : PersistentPanel
         }
 
         gameClient.SubmitFactionFlaw(stateManager.AnotherFaction.Id, flaw);
+    }
+
+    private void OnSubmitAttackButtonClicked()
+    {
+        string attack = inputField.text.Trim();
+        if (string.IsNullOrEmpty(attack))
+        {
+            Debug.LogWarning("Attack input is empty");
+            return;
+        }
+        gameClient.SubmitAttack(attack);
+    }
+
+    private void OnSubmitDefenseButtonClicked()
+    {
+        string defense = inputField.text.Trim();
+        if (string.IsNullOrEmpty(defense))
+        {
+            Debug.LogWarning("Defense input is empty");
+            return;
+        }
+        gameClient.SubmitDefense(defense);
     }
 }

@@ -70,10 +70,10 @@ public class Match
     public string Id { get; set; }
 
     [JsonProperty("attackerId")]
-    public string AttackerId { get; set; }
+    public string AttackerId { get; set; } // faction id not player id
 
     [JsonProperty("defenderId")]
-    public string DefenderId { get; set; }
+    public string DefenderId { get; set; } // faction id not player id
 
     [JsonProperty("attackDescription")]
     public string AttackDescription { get; set; }
