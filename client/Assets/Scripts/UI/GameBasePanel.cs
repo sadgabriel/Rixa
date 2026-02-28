@@ -167,22 +167,19 @@ public class GameBasePanel : PersistentPanel
 
             switch (state)
             {
-                case UIState.GAME_LOBBY:
-                    inputField.interactable = false;
-                    break;
                 case UIState.GAME_CONTEXT_INPUT:
                     if (!stateManager.IsLeader())
                     {
                         inputField.interactable = false;
                     }
                     break;
-                case UIState.GAME_CONTEXT_SETUP:
-                    inputField.interactable = false;
-                    break;
-                case UIState.GAME_CONTEXT_SETUP_FINISH:
-                    inputField.interactable = false;
+                case UIState.GAME_FACTION_CONCEPT_INPUT:
+                case UIState.GAME_FACTION_FLAW_INPUT:
+                case UIState.GAME_ATTACK:
+                case UIState.GAME_DEFENSE:
                     break;
                 default:
+                    inputField.interactable = false;
                     break;
             }
         } else
