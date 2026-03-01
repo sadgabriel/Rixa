@@ -247,6 +247,10 @@ async function handleGameSubmit(client, data) {
                 broadcastGameState(game);
                 await sleep(5000);
                 game.endCompetitionFinish();
+                if (game.phase === GamePhase.END) {
+                    await sleep(5000);
+                    game.reset();
+                }
             }
             break;
     }

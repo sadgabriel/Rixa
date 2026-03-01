@@ -388,8 +388,21 @@ export class Game {
         }
     }
 
-    restart() {
-        // TBD
+    reset() {
+        this.phase = GamePhase.LOBBY;
+        this.judge.resetSession();
+        this.idToFactionMap = new Map();
+        this.idToMatchMap = new Map();
+        this.round = 0;
+        this.context = createContext();
+        this.roundOffsets = [];
+        this.playerCycle = [];
+        this.setupOffset = 0;
+
+        for (const player of this.idToPlayerMap.values()) {
+            player.factionId = null;
+            player.ready = false;
+        }
     }
 }
 
