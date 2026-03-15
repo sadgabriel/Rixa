@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public enum UIContext { App, Game }
+public enum UIContext { APP, GAME }
 
 public abstract class Panel : MonoBehaviour
 {

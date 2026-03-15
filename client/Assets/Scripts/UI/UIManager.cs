@@ -22,11 +22,11 @@ public class UIManager : MonoBehaviour
     private Dictionary<UIState, NonPersistentPanel> nonPersistentPanels = new Dictionary<UIState, NonPersistentPanel>();
     private Dictionary<UIContext, List<PersistentPanel>> persistentPanels = new Dictionary<UIContext, List<PersistentPanel>>()
     {
-        { UIContext.App, new List<PersistentPanel>() },
-        { UIContext.Game, new List<PersistentPanel>() }
+        { UIContext.APP, new List<PersistentPanel>() },
+        { UIContext.GAME, new List<PersistentPanel>() }
     };
 
-    private UIContext currentContext = UIContext.App;
+    private UIContext currentContext = UIContext.APP;
     private UIState currentState = UIState.IDLE;
     
 
@@ -58,6 +58,11 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        Panel idlePanel = nonPersistentPanels[UIState.IDLE];
+        if (idlePanel != null) {
+            idlePanel.Show();
+        }
+
         stateManager = StateManager.Instance;
         stateManager.OnUIStateUpdated += HandleUIStateUpdated;
     }
@@ -77,8 +82,8 @@ public class UIManager : MonoBehaviour
 
     private void HandleUIStateUpdated(UIState nextState, bool stateChanged)
     {
-        Debug.Log($"[UIManager] UIState updated: {currentState} → {nextState}");
         if (!stateChanged) return;
+        Debug.Log($"[UIManager] UIState updated: {currentState} → {nextState}");
 
         UIContext nextContext = GetContext(nextState);
 
@@ -104,7 +109,7 @@ public class UIManager : MonoBehaviour
         {
             newPanel.Show();
         }
-        else if (nextState != UIState.IDLE && nextState != UIState.None)
+        else if (nextState != UIState.IDLE && nextState != UIState.NONE)
         {
             Debug.LogWarning($"[UIManager] No panel registered for state: {nextState}");
         }
@@ -117,16 +122,12 @@ public class UIManager : MonoBehaviour
     {
         switch (state)
         {
+            case UIState.NONE:
             case UIState.IDLE:
             case UIState.APP_LOBBY:
-                return UIContext.App;
-            
-            case UIState.None:
-                Debug.LogWarning($"[UIManager] UIState.None has no context");
-                return UIContext.App;
-            
+                return UIContext.APP;          
             default:
-                return UIContext.Game;
+                return UIContext.GAME;
         }
     }
 }

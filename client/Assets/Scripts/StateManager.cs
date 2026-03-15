@@ -4,7 +4,7 @@ using System.Linq;
 
 public enum UIState
 {
-    None,
+    NONE,
     IDLE,
 
     APP_LOBBY,

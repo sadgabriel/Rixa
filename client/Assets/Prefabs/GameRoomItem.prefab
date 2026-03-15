@@ -32,9 +32,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6942677366905993654}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -320, y: 10}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 102, y: 17}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9019053942858363662
@@ -92,8 +92,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 44
-  m_fontSizeBase: 44
+  m_fontSize: 48
+  m_fontSizeBase: 48
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -176,7 +176,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 540, y: -292}
-  m_SizeDelta: {x: 830, y: 180}
+  m_SizeDelta: {x: 845, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3305084793289351553
 CanvasRenderer:
@@ -199,14 +199,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.9647059, g: 0.96862745, b: 0.96862745, a: 0.6}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: 6eddec60ec4104b4f9f30ee5dd5e32ad, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -231,12 +231,12 @@ MonoBehaviour:
   gameNameText: {fileID: 5702013830550845703}
   playerCountText: {fileID: 8930435007066266891}
   statusText: {fileID: 1968127593011333797}
-  normalColor: {r: 1, g: 1, b: 1, a: 0.8}
-  selectedColor: {r: 0.7, g: 0.9, b: 1, a: 1}
-  hoverColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
-  disabledColor: {r: 0.7, g: 0.7, b: 0.7, a: 0.5}
-  waitingColor: {r: 0, g: 1, b: 0, a: 1}
-  playingColor: {r: 1, g: 0, b: 0, a: 1}
+  normalColor: {r: 0.9647059, g: 0.96862745, b: 0.96862745, a: 0.6}
+  selectedColor: {r: 0.9607843, g: 0.78039217, b: 0.23921569, a: 0.8}
+  hoverColor: {r: 0.91764706, g: 0.92156863, b: 0.92156863, a: 0.8}
+  disabledColor: {r: 0.6039216, g: 0.6313726, b: 0.6313726, a: 0.6}
+  waitingColor: {r: 0.23529412, g: 0.8666667, b: 0.44313726, a: 1}
+  playingColor: {r: 0.9019608, g: 0.23529412, b: 0.21176471, a: 1}
 --- !u!1 &2906393518461336483
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,9 +269,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6942677366905993654}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -196, y: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 221.7, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &728464377999199037
@@ -406,9 +406,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6942677366905993654}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -320, y: -35}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 103, y: -34}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3492390210261167996
