@@ -232,7 +232,7 @@ MonoBehaviour:
   playerCountText: {fileID: 8930435007066266891}
   statusText: {fileID: 1968127593011333797}
   normalColor: {r: 0.9647059, g: 0.96862745, b: 0.96862745, a: 0.6}
-  selectedColor: {r: 0.9607843, g: 0.78039217, b: 0.23921569, a: 0.8}
+  selectedColor: {r: 0.98039216, g: 0.85882354, b: 0.61960787, a: 0.8}
   hoverColor: {r: 0.91764706, g: 0.92156863, b: 0.92156863, a: 0.8}
   disabledColor: {r: 0.6039216, g: 0.6313726, b: 0.6313726, a: 0.6}
   waitingColor: {r: 0.23529412, g: 0.8666667, b: 0.44313726, a: 1}

@@ -1,11 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class StatusIndicator : MonoBehaviour
 {
-    [SerializeField] private Image indicatorImage;
-    [SerializeField] private Color readyColor = Color.green;
-    [SerializeField] private Color completedColor = Color.blue;
+    [SerializeField] private TextMeshProUGUI statusText;
     
     private void Awake()
     {
@@ -14,13 +13,13 @@ public class StatusIndicator : MonoBehaviour
     
     public void ShowReady()
     {
-        indicatorImage.color = readyColor;
+        statusText.text = "준비 완료";
         gameObject.SetActive(true);
     }
     
     public void ShowCompleted()
     {
-        indicatorImage.color = completedColor;
+        statusText.text = "제출 완료";
         gameObject.SetActive(true);
     }
     
