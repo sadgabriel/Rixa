@@ -9,3 +9,13 @@ public class Dialog : MonoBehaviour
         dialogManager = DialogManager.Instance;
     }
 }
+
+public interface IConfirmable
+{
+    void OnConfirm();
+}
+
+public interface ICancelable
+{
+    void OnCancel();
+}

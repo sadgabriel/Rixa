@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using TMPro;
 
-public class JoinGameDialog : Dialog
+public class JoinGameDialog : Dialog, IConfirmable, ICancelable
 {   
     [SerializeField] private TMP_InputField playerNameInputField;
 
@@ -15,7 +15,7 @@ public class JoinGameDialog : Dialog
         onCancelCallback = onCancel;
     }
 
-    public void OnConfirmButtonClicked()
+    public void OnConfirm()
     {
         if (onConfirmCallback != null)
         {
@@ -24,7 +24,7 @@ public class JoinGameDialog : Dialog
         }
     }
 
-    public void OnCancelButtonClicked()
+    public void OnCancel()
     {
         if (onCancelCallback != null)
         {

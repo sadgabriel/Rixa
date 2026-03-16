@@ -2,12 +2,12 @@ using System;
 using UnityEngine;
 using TMPro;
 
-public class FactionDialog : Dialog
+public class FactionDialog : Dialog, ICancelable
 {
     [SerializeField] private TextMeshProUGUI factionNameText;
     [SerializeField] private TextMeshProUGUI factionDescriptionText;
 
-    private Action onCloseButtonClickedCallback;
+    private Action onCancelCallback;
 
     public void SetFactionInfo(string factionName, string factionDescription)
     {
@@ -15,16 +15,16 @@ public class FactionDialog : Dialog
         factionDescriptionText.text = factionDescription;
     }
 
-    public void SetOnCloseButtonClickedCallback(Action callback)
+    public void SetCallback(Action onCancel)
     {
-        onCloseButtonClickedCallback = callback;
+        onCancelCallback = onCancel;
     }
 
-    public void OnCloseButtonClicked()
+    public void OnCancel()
     {
-        if (onCloseButtonClickedCallback != null)
+        if (onCancelCallback != null)
         {
-            onCloseButtonClickedCallback.Invoke();
+            onCancelCallback.Invoke();
         }
     }
 }

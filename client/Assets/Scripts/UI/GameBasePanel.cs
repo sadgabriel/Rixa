@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
+
 
 public class GameBasePanel : PersistentPanel
 {
@@ -13,6 +15,17 @@ public class GameBasePanel : PersistentPanel
     [SerializeField] private GameObject playerDataItemPrefab;
 
     private List<PlayerDataItem> playerDataItems = new List<PlayerDataItem>();
+
+    private void Update()
+    {
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.enterKey.wasPressedThisFrame && !dialogManager.IsDialogOpen)
+            {
+                mainButton.onClick.Invoke();    
+            }
+        }
+    }
 
     private void OnEnable()
     {

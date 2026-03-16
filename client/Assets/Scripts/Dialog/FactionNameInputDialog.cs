@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using TMPro;
 
-public class FactionNameInputDialog : Dialog
+public class FactionNameInputDialog : Dialog, IConfirmable, ICancelable
 {   
     [SerializeField] private TMP_InputField factionNameInputField;
 
@@ -15,7 +15,7 @@ public class FactionNameInputDialog : Dialog
         onCancelCallback = onCancel;
     }
 
-    public void OnConfirmButtonClicked()
+    public void OnConfirm()
     {
         if (onConfirmCallback != null)
         {
@@ -24,7 +24,7 @@ public class FactionNameInputDialog : Dialog
         }
     }
 
-    public void OnCancelButtonClicked()
+    public void OnCancel()
     {
         if (onCancelCallback != null)
         {

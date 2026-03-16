@@ -49,22 +49,59 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         if (string.IsNullOrEmpty(playerId)) return;
 
         Player player = stateManager.GetPlayerById(playerId);
-        if (player == null) return;
-        playerNameText.text = player.Name;
+        if (player != null)
+        {
+            playerNameText.text = player.Name;
+        }
+        
+
+        Faction faction = stateManager.GetFactionById(player.FactionId);
+        if (faction != null)
+        {
+            factionNameText.text = string.IsNullOrEmpty(faction.Name) ? "-" : faction.Name;
+            scoreText.text = $"{faction.Score}";
+        }
 
         if (stateManager.CurrentUIState == UIState.GAME_LOBBY && player.Ready)
         {
             statusIndicator.ShowReady();
         }
+        else if (stateManager.CurrentUIState == UIState.GAME_FACTION_CONCEPT_INPUT && !string.IsNullOrEmpty(faction.RawConcept))
+        {
+            statusIndicator.ShowCompleted();
+        }
+        else if (stateManager.CurrentUIState == UIState.GAME_FACTION_FLAW_INPUT && string.IsNullOrEmpty(faction.RawFlaw))
+        {
+            statusIndicator.ShowCompleted();
+        }
+        else if (stateManager.CurrentUIState == UIState.GAME_ATTACK)
+        {
+            Match match = stateManager.CurrentGameState.Matches.Find(m => m.AttackerId == faction.Id);
+            if (match != null && !string.IsNullOrEmpty(match.AttackDescription))
+            {
+                statusIndicator.ShowCompleted();
+            }
+            else
+            {
+                statusIndicator.Hide();
+            }
+        }
+        else if (stateManager.CurrentUIState == UIState.GAME_DEFENSE)
+        {
+            Match match = stateManager.CurrentGameState.Matches.Find(m => m.DefenderId == faction.Id);
+            if (match != null && !string.IsNullOrEmpty(match.DefenseDescription))
+            {
+                statusIndicator.ShowCompleted();
+            }
+            else
+            {
+                statusIndicator.Hide();
+            }
+        }
         else
         {
             statusIndicator.Hide();
         }
-
-        Faction faction = stateManager.GetFactionById(player.FactionId);
-        if (faction == null) return;
-        factionNameText.text = string.IsNullOrEmpty(faction.Name) ? "-" : faction.Name;
-        scoreText.text = $"{faction.Score}";
     }
 
     public void OnPointerClick(PointerEventData eventData)

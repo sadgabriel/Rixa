@@ -28,6 +28,8 @@ public class DialogManager : MonoBehaviour
 
     private Stack<GameObject> dialogStack = new Stack<GameObject>();
 
+    public bool IsDialogOpen => dialogStack.Count > 0;
+
     private void Awake()
     {
         if (instance == null)
@@ -47,9 +49,24 @@ public class DialogManager : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current != null)
         {
-            CloseTopDialog();
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                CloseTopDialog();
+            } else if (Keyboard.current.enterKey.wasPressedThisFrame)
+            {
+                if (IsDialogOpen)
+                {
+                    GameObject topDialog = dialogStack.Peek();
+                    IConfirmable confirmable = topDialog.GetComponent<IConfirmable>();
+                    if (confirmable != null)
+                    {
+                        confirmable.OnConfirm();
+                    }
+                }
+            }
+            
         }
     }
 
@@ -75,12 +92,12 @@ public class DialogManager : MonoBehaviour
         joinGameDialog?.SetCallbacks(onConfirm, onCancel);
     }
 
-    public void ShowFactionDialog(string factionName, string factionDescription, Action onClose = null)
+    public void ShowFactionDialog(string factionName, string factionDescription, Action onCancel = null)
     {
         GameObject dialogGO = ShowDialog(factionDialogPrefab);
         FactionDialog factionDialog = dialogGO.GetComponent<FactionDialog>();
         factionDialog?.SetFactionInfo(factionName, factionDescription);
-        factionDialog?.SetOnCloseButtonClickedCallback(onClose);
+        factionDialog?.SetCallback(onCancel);
     }
 
     public void ShowFactionNameInputDialog(Action<string> onConfirm, Action onCancel = null)
@@ -104,7 +121,7 @@ public class DialogManager : MonoBehaviour
 
     public void CloseTopDialog()
     {
-        if (dialogStack.Count > 0)
+        if (IsDialogOpen)
         {
             GameObject topDialog = dialogStack.Pop();
             Destroy(topDialog);

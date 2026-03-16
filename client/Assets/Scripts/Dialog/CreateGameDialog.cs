@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using TMPro;
 
-public class CreateGameDialog : Dialog
+public class CreateGameDialog : Dialog, IConfirmable, ICancelable
 {
     [SerializeField] private TMP_InputField gameNameInputField;
     [SerializeField] private TMP_InputField playerNameInputField;
@@ -17,7 +17,7 @@ public class CreateGameDialog : Dialog
         onCancelCallback = onCancel;
     }
 
-    public void OnConfirmButtonClicked()
+    public void OnConfirm()
     {
         if (onConfirmCallback != null)
         {
@@ -27,7 +27,7 @@ public class CreateGameDialog : Dialog
         }
     }
 
-    public void OnCancelButtonClicked()
+    public void OnCancel()
     {
         if (onCancelCallback != null)
         {
