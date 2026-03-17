@@ -21,6 +21,7 @@ public class DialogManager : MonoBehaviour
     [SerializeField] private GameObject modalBackground;
     [SerializeField] private Transform dialogContainer;
 
+    [SerializeField] private GameObject confirmationDialogPrefab;
     [SerializeField] private GameObject createGameDialogPrefab;
     [SerializeField] private GameObject joinGameDialogPrefab;
     [SerializeField] private GameObject factionDialogPrefab;
@@ -78,10 +79,18 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    public void ShowConfirmationDialog(string message, Action onConfirm, Action onCancel = null)
+    {
+        GameObject dialogGO = ShowDialog(confirmationDialogPrefab);
+        ConfirmationDialog confirmationDialog = dialogGO.GetComponent<ConfirmationDialog>();
+        confirmationDialog?.SetMessage(message);
+        confirmationDialog?.SetCallbacks(onConfirm, onCancel);
+    }
+
     public void ShowCreateGameDialog(Action<string, string> onConfirm, Action onCancel = null)
     {
-        GameObject dialog = ShowDialog(createGameDialogPrefab);
-        CreateGameDialog createGameDialog = dialog.GetComponent<CreateGameDialog>();
+        GameObject dialogGO = ShowDialog(createGameDialogPrefab);
+        CreateGameDialog createGameDialog = dialogGO.GetComponent<CreateGameDialog>();
         createGameDialog?.SetCallbacks(onConfirm, onCancel);
     }
 
@@ -92,11 +101,12 @@ public class DialogManager : MonoBehaviour
         joinGameDialog?.SetCallbacks(onConfirm, onCancel);
     }
 
-    public void ShowFactionDialog(string factionName, string factionDescription, Action onCancel = null)
+    public void ShowFactionDialog(string factionName, string factionDescription, string resourceName1, int resourceValue1, string resourceName2, int resourceValue2, string resourceName3, int resourceValue3, Action onCancel = null)
     {
         GameObject dialogGO = ShowDialog(factionDialogPrefab);
         FactionDialog factionDialog = dialogGO.GetComponent<FactionDialog>();
         factionDialog?.SetFactionInfo(factionName, factionDescription);
+        factionDialog?.SetResourceInfo(resourceName1, resourceValue1, resourceName2, resourceValue2, resourceName3, resourceValue3);
         factionDialog?.SetCallback(onCancel);
     }
 

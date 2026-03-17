@@ -12,6 +12,7 @@ public class GameBasePanel : PersistentPanel
     [SerializeField] private Transform playerDataRightContainer;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private Button mainButton;
+    [SerializeField] private Button ExitButton;
     [SerializeField] private GameObject playerDataItemPrefab;
 
     private List<PlayerDataItem> playerDataItems = new List<PlayerDataItem>();
@@ -46,6 +47,22 @@ public class GameBasePanel : PersistentPanel
         stateManager.OnGameStateUpdated -= HandleGameStateUpdated;
         stateManager.OnUIStateUpdated -= HandleUIStateUpdated;
         ClearPlayerData();
+    }
+
+    public void OnExitButtonClicked()
+    {
+        dialogManager.ShowConfirmationDialog(
+            "게임에서 나가시겠습니까?",
+            onConfirm: () =>
+            {
+                gameClient.LeaveGame();
+                dialogManager.CloseTopDialog();
+            },
+            onCancel: () =>
+            {
+                dialogManager.CloseTopDialog();
+            }
+        );
     }
 
     private void HandleGameStateUpdated(GameState gameState)
@@ -88,8 +105,21 @@ public class GameBasePanel : PersistentPanel
 
     private void HandleUIStateUpdated(UIState newState, bool stateChanged)
     {
+        ConfigureExitButton(newState, stateChanged);
         ConfigureMainButton(newState, stateChanged);
         ConfigureInputField(newState, stateChanged);
+    }
+
+    private void ConfigureExitButton(UIState state, bool stateChanged = true)
+    {
+        if (state == UIState.GAME_LOBBY)
+        {
+            ExitButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            ExitButton.gameObject.SetActive(false);
+        }
     }
 
     private void ConfigureMainButton(UIState state, bool stateChanged = true)
@@ -232,6 +262,7 @@ public class GameBasePanel : PersistentPanel
         }
         
     }
+
     private void OnReadyButtonClicked()
     {
         Player myPlayer = stateManager.MyPlayer;

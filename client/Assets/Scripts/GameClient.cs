@@ -211,72 +211,83 @@ public class GameClient : MonoBehaviour
 
     private void HandleWelcomeMessage(JToken data)
     {
+        ClientState clientState = null;
+        LobbyState lobbyState = null;
         try
         {
-            ClientState clientState = data["clientState"]?.ToObject<ClientState>();
-            LobbyState lobbyState = data["lobbyState"]?.ToObject<LobbyState>();
-
-            if (clientState != null)
-            {
-                OnClientStateUpdated?.Invoke(clientState);
-            }
-            
-            if (lobbyState != null)
-            {
-                OnLobbyStateUpdated?.Invoke(lobbyState);
-            }
+            clientState = data["clientState"]?.ToObject<ClientState>();
+            lobbyState = data["lobbyState"]?.ToObject<LobbyState>();
         }
         catch (Exception e)
         {
             Debug.LogError($"Failed to parse welcome message: {e.Message}");
         }
+
+        if (clientState != null)
+        {
+            OnClientStateUpdated?.Invoke(clientState);
+        }
+        
+        if (lobbyState != null)
+        {
+            OnLobbyStateUpdated?.Invoke(lobbyState);
+        }
     }
 
     private void HandleClientStateMessage(JToken data)
     {
+        ClientState clientState = null;
         try
         {
-            ClientState clientState = data?.ToObject<ClientState>();
-            if (clientState != null)
-            {
-                OnClientStateUpdated?.Invoke(clientState);
-            }
+            clientState = data?.ToObject<ClientState>();
         }
         catch (Exception e)
         {
             Debug.LogError($"Failed to parse client state: {e.Message}");
         }
+
+        if (clientState != null)
+        {
+            OnClientStateUpdated?.Invoke(clientState);
+        }
     }
 
     private void HandleLobbyStateMessage(JToken data)
     {
+        LobbyState lobbyState = null;
         try
         {
-            LobbyState lobbyState = data?.ToObject<LobbyState>();
-            if (lobbyState != null)
-            {
-                OnLobbyStateUpdated?.Invoke(lobbyState);
-            }
+            lobbyState = data?.ToObject<LobbyState>();
         }
         catch (Exception e)
         {
             Debug.LogError($"Failed to parse lobby state: {e.Message}");
         }
+
+        if (lobbyState != null)
+        {
+            OnLobbyStateUpdated?.Invoke(lobbyState);
+        }
     }
 
     private void HandleGameStateMessage(JToken data)
     {
+        GameState gameState = null;
+        
         try
         {
-            GameState gameState = data?.ToObject<GameState>();
-            if (gameState != null)
-            {
-                OnGameStateUpdated?.Invoke(gameState);
-            }
+            gameState = data?.ToObject<GameState>();
         }
         catch (Exception e)
         {
             Debug.LogError($"Failed to parse game state: {e.Message}");
+            Debug.LogError($"Data: {data}");
+            return;
+        }
+        
+        if (gameState != null)
+        {
+            OnGameStateUpdated?.Invoke(gameState);
         }
     }
 }

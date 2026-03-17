@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
+
 
 public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
 {
@@ -70,7 +72,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         {
             statusIndicator.ShowCompleted();
         }
-        else if (stateManager.CurrentUIState == UIState.GAME_FACTION_FLAW_INPUT && string.IsNullOrEmpty(faction.RawFlaw))
+        else if (stateManager.CurrentUIState == UIState.GAME_FACTION_FLAW_INPUT && !string.IsNullOrEmpty(faction.RawFlaw))
         {
             statusIndicator.ShowCompleted();
         }
@@ -113,12 +115,24 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
 
         Faction faction = stateManager.GetFactionById(player.FactionId);
         
-        string factionName = faction?.Name ?? "미정";
+        string factionName = faction?.Name ?? "진영명 미정";
         string factionDescription = faction?.Description ?? "";
-        
-        dialogManager.ShowFactionDialog(factionName, factionDescription, () =>
+
+        List<Resource> resources = faction?.Resources;
+
+        if (resources != null && resources.Count >= 3)
         {
-            dialogManager.CloseTopDialog();
-        });
+            dialogManager.ShowFactionDialog(factionName, factionDescription, resources[0].Name, resources[0].Count, resources[1].Name, resources[1].Count, resources[2].Name, resources[2].Count, () =>
+            {
+                dialogManager.CloseTopDialog();
+            });
+        }
+        else
+        {
+            dialogManager.ShowFactionDialog(factionName, factionDescription, "자원명 1", 0, "자원명 2", 0, "자원명 3", 0, () =>
+            {
+                dialogManager.CloseTopDialog();
+            });
+        }
     }
 }
