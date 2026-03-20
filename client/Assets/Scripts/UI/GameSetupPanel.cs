@@ -17,7 +17,7 @@ public class GameSetupPanel : NonPersistentPanel
         }
         else
         {
-            contextText.text = $"게임 설정: {context.RawContextDescription}";
+            contextText.text = context.RawContextDescription;
         }
 
         Faction myFaction = stateManager.MyFaction;
@@ -28,8 +28,8 @@ public class GameSetupPanel : NonPersistentPanel
         }
         else
         {
-            factionConceptText.text = $"진영 컨셉: {myFaction.RawConcept}";
-            factionFlawText.text = $"진영 결점: {myFaction.RawFlaw}";
+            factionConceptText.text = myFaction.RawConcept;
+            factionFlawText.text = myFaction.RawFlaw;
         }
     }
 }

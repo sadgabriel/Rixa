@@ -19,7 +19,7 @@ public class GameSetupFinishPanel : NonPersistentPanel
         }
         else
         {
-            contextText.text = $"게임 설정: {context.Description}";
+            contextText.text = context.Description;
         }
 
         Faction myFaction = stateManager.MyFaction;
@@ -30,12 +30,11 @@ public class GameSetupFinishPanel : NonPersistentPanel
         }
         else
         {
-            factionDescriptionText.text = $"진영 설명: {myFaction.Description}";
+            factionDescriptionText.text = myFaction.Description;
             
             List<Resource> resources = myFaction.Resources;
             StringBuilder resourceTextBuilder = new StringBuilder();
 
-            resourceTextBuilder.AppendLine("진영 자원:");
             foreach (Resource resource in resources)
             {
                 resourceTextBuilder.AppendLine($"- {resource.Name}: {resource.Description}");
