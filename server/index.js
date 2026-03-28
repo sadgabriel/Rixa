@@ -225,7 +225,7 @@ async function handleGameSubmit(client, data) {
                 broadcastGameState(game);
                 await game.setupContext();
                 broadcastGameState(game);
-                await sleep(5000);
+                await sleep(10000);
                     game.endContextSetupFinish();
             }
             break;
@@ -245,10 +245,10 @@ async function handleGameSubmit(client, data) {
                 await game.narrateCompetition();
 
                 broadcastGameState(game);
-                await sleep(5000);
+                await sleep(10000);
                 game.endCompetitionFinish();
                 if (game.phase === GamePhase.END) {
-                    await sleep(5000);
+                    await sleep(10000);
                     game.reset();
                 }
             }
