@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
 
-
 public class GameBasePanel : PersistentPanel
 {
     [SerializeField] private Transform playerDataLeftContainer;
@@ -34,8 +33,7 @@ public class GameBasePanel : PersistentPanel
 
         if (stateManager != null)
         {
-            ConfigureMainButton(stateManager.CurrentUIState);
-            ConfigureInputField(stateManager.CurrentUIState);
+            SetupUIForState(stateManager.CurrentUIState);
         }
 
         stateManager.OnGameStateUpdated += HandleGameStateUpdated;
@@ -49,20 +47,11 @@ public class GameBasePanel : PersistentPanel
         ClearPlayerData();
     }
 
-    public void OnExitButtonClicked()
+    private void HandleUIStateUpdated(UIState newState, bool stateChanged)
     {
-        dialogManager.ShowConfirmationDialog(
-            "게임에서 나가시겠습니까?",
-            onConfirm: () =>
-            {
-                gameClient.LeaveGame();
-                dialogManager.CloseTopDialog();
-            },
-            onCancel: () =>
-            {
-                dialogManager.CloseTopDialog();
-            }
-        );
+        if (!stateChanged) return;
+        
+        SetupUIForState(newState);
     }
 
     private void HandleGameStateUpdated(GameState gameState)
@@ -72,6 +61,201 @@ public class GameBasePanel : PersistentPanel
         if (gameState.Players.Count != playerDataItems.Count)
         {
             RefreshPlayerData();
+        }
+        
+        UpdateUIForState(stateManager.CurrentUIState);
+    }
+
+    private void SetupUIForState(UIState state)
+    {
+        SetupExitButton(state);
+        SetupMainButton(state);
+        SetupInputField(state);
+    }
+
+    private void UpdateUIForState(UIState state)
+    {
+        UpdateMainButton(state);
+        UpdateInputField(state);
+    }
+
+    private void SetupExitButton(UIState state)
+    {
+        ExitButton.gameObject.SetActive(state == UIState.GAME_LOBBY);
+    }
+
+    private void SetupMainButton(UIState state)
+    {
+        mainButton.onClick.RemoveAllListeners();
+        mainButton.interactable = true;
+
+        var buttonText = mainButton.GetComponentInChildren<TextMeshProUGUI>();
+        buttonText.text = "제출";
+
+        switch (state)
+        {
+            case UIState.GAME_LOBBY:
+                SetupLobbyButton(buttonText);
+                break;
+            case UIState.GAME_CONTEXT_INPUT:
+                if (!stateManager.IsLeader())
+                {
+                    mainButton.interactable = false;
+                }
+                mainButton.onClick.AddListener(OnSubmitContextButtonClicked);
+                break;
+            case UIState.GAME_FACTION_CONCEPT_INPUT:
+                mainButton.onClick.AddListener(OnSubmitFactionConceptButtonClicked);
+                break;
+            case UIState.GAME_FACTION_FLAW_INPUT:
+                mainButton.onClick.AddListener(OnSubmitFactionFlawButtonClicked);
+                break;
+            case UIState.GAME_ATTACK:
+                mainButton.onClick.AddListener(OnSubmitAttackButtonClicked);
+                break;
+            case UIState.GAME_DEFENSE:
+                mainButton.onClick.AddListener(OnSubmitDefenseButtonClicked);
+                break;
+            default:
+                mainButton.interactable = false;
+                break;
+        }
+    }
+
+    private void SetupLobbyButton(TextMeshProUGUI buttonText)
+    {
+        Player myPlayer = stateManager.MyPlayer;
+        
+        if (stateManager.IsFirst())
+        {
+            buttonText.text = "게임 시작";
+            mainButton.interactable = stateManager.CanGameStart();
+            mainButton.onClick.AddListener(OnStartButtonClicked);
+        }
+        else
+        {
+            bool isReady = myPlayer?.Ready ?? false;
+            buttonText.text = isReady ? "준비 취소" : "준비";
+            mainButton.onClick.AddListener(OnReadyButtonClicked);
+        }
+    }
+
+    private void SetupInputField(UIState state)
+    {
+        inputField.text = string.Empty;
+        inputField.interactable = true;
+
+        switch (state)
+        {
+            case UIState.GAME_CONTEXT_INPUT:
+                if (!stateManager.IsLeader())
+                {
+                    inputField.interactable = false;
+                }
+                break;
+            case UIState.GAME_FACTION_CONCEPT_INPUT:
+            case UIState.GAME_FACTION_FLAW_INPUT:
+            case UIState.GAME_ATTACK:
+            case UIState.GAME_DEFENSE:
+                break;
+            default:
+                inputField.interactable = false;
+                break;
+        }
+    }
+
+    private void UpdateMainButton(UIState state)
+    {
+        if (state == UIState.GAME_LOBBY)
+        {
+            UpdateLobbyButton();
+            return;
+        }
+        
+        UpdateSubmitButton(state);
+    }
+
+    private void UpdateLobbyButton()
+    {
+        Player myPlayer = stateManager.MyPlayer;
+        var buttonText = mainButton.GetComponentInChildren<TextMeshProUGUI>();
+        
+        mainButton.onClick.RemoveAllListeners();
+        mainButton.interactable = true;
+        
+        if (stateManager.IsFirst())
+        {
+            buttonText.text = "게임 시작";
+            mainButton.interactable = stateManager.CanGameStart();
+            mainButton.onClick.AddListener(OnStartButtonClicked);
+        }
+        else
+        {
+            bool isReady = myPlayer?.Ready ?? false;
+            buttonText.text = isReady ? "준비 취소" : "준비";
+            mainButton.onClick.AddListener(OnReadyButtonClicked);
+        }
+    }
+
+    private void UpdateSubmitButton(UIState state)
+    {
+        bool hasSubmitted = HasAlreadySubmitted(state);
+        mainButton.interactable = !hasSubmitted;
+    }
+
+    private void UpdateInputField(UIState state)
+    {
+        bool hasSubmitted = HasAlreadySubmitted(state);
+        
+        inputField.interactable = !hasSubmitted;
+        
+        if (hasSubmitted)
+        {
+            inputField.text = GetSubmittedText(state);
+        }
+    }
+
+    private bool HasAlreadySubmitted(UIState state)
+    {
+        Faction myFaction = stateManager.MyFaction;
+        Faction anotherFaction = stateManager.AnotherFaction;
+        Match myAttackMatch = stateManager.MyAttackMatch;
+        Match myDefenseMatch = stateManager.MyDefenseMatch;
+
+        switch (state)
+        {
+            case UIState.GAME_FACTION_CONCEPT_INPUT:
+                return myFaction != null && !string.IsNullOrEmpty(myFaction.RawConcept);
+            case UIState.GAME_FACTION_FLAW_INPUT:
+                return anotherFaction != null && !string.IsNullOrEmpty(anotherFaction.RawFlaw);
+            case UIState.GAME_ATTACK:
+                return myAttackMatch != null && !string.IsNullOrEmpty(myAttackMatch.AttackDescription);
+            case UIState.GAME_DEFENSE:
+                return myDefenseMatch != null && !string.IsNullOrEmpty(myDefenseMatch.DefenseDescription);
+            default:
+                return false;
+        }
+    }
+
+    private string GetSubmittedText(UIState state)
+    {
+        Faction myFaction = stateManager.MyFaction;
+        Faction anotherFaction = stateManager.AnotherFaction;
+        Match myAttackMatch = stateManager.MyAttackMatch;
+        Match myDefenseMatch = stateManager.MyDefenseMatch;
+
+        switch (state)
+        {
+            case UIState.GAME_FACTION_CONCEPT_INPUT:
+                return myFaction?.RawConcept ?? string.Empty;
+            case UIState.GAME_FACTION_FLAW_INPUT:
+                return anotherFaction?.RawFlaw ?? string.Empty;
+            case UIState.GAME_ATTACK:
+                return myAttackMatch?.AttackDescription ?? string.Empty;
+            case UIState.GAME_DEFENSE:
+                return myDefenseMatch?.DefenseDescription ?? string.Empty;
+            default:
+                return string.Empty;
         }
     }
 
@@ -103,164 +287,20 @@ public class GameBasePanel : PersistentPanel
         playerDataItems.Clear();
     }
 
-    private void HandleUIStateUpdated(UIState newState, bool stateChanged)
+    public void OnExitButtonClicked()
     {
-        ConfigureExitButton(newState, stateChanged);
-        ConfigureMainButton(newState, stateChanged);
-        ConfigureInputField(newState, stateChanged);
-    }
-
-    private void ConfigureExitButton(UIState state, bool stateChanged = true)
-    {
-        if (state == UIState.GAME_LOBBY)
-        {
-            ExitButton.gameObject.SetActive(true);
-        }
-        else
-        {
-            ExitButton.gameObject.SetActive(false);
-        }
-    }
-
-    private void ConfigureMainButton(UIState state, bool stateChanged = true)
-    {
-        Faction myFaction = stateManager.MyFaction;
-        Match myAttackMatch = stateManager.MyAttackMatch;
-        Match myDefenseMatch = stateManager.MyDefenseMatch;
-        var buttonText = mainButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-        if (stateChanged)
-        {
-            mainButton.interactable = true;
-            mainButton.onClick.RemoveAllListeners();
-            buttonText.text = "제출";
-            switch (state)
+        dialogManager.ShowConfirmationDialog(
+            "게임에서 나가시겠습니까?",
+            onConfirm: () =>
             {
-                case UIState.GAME_LOBBY:
-                    Player myPlayer = stateManager.MyPlayer;
-                    bool isReady = myPlayer?.Ready ?? false;
-                    buttonText.text = isReady ? "준비 취소" : "준비";
-                    mainButton.onClick.AddListener(OnReadyButtonClicked);
-                    break;
-                case UIState.GAME_CONTEXT_INPUT:
-                    if (!stateManager.IsLeader())
-                    {
-                        mainButton.interactable = false;
-                    }
-                    mainButton.onClick.AddListener(OnSubmitContextButtonClicked);
-                    break;
-                case UIState.GAME_FACTION_CONCEPT_INPUT:
-                    mainButton.onClick.AddListener(OnSubmitFactionConceptButtonClicked);
-                    break;
-                case UIState.GAME_FACTION_FLAW_INPUT:
-                    mainButton.onClick.AddListener(OnSubmitFactionFlawButtonClicked);
-                    break;
-                case UIState.GAME_ATTACK:
-                    mainButton.onClick.AddListener(OnSubmitAttackButtonClicked);
-                    break;
-                case UIState.GAME_DEFENSE:
-                    mainButton.onClick.AddListener(OnSubmitDefenseButtonClicked);
-                    break;
-                default:
-                    mainButton.interactable = false;
-                    break;
-            }
-        } else {
-            switch (state)
+                gameClient.LeaveGame();
+                dialogManager.CloseTopDialog();
+            },
+            onCancel: () =>
             {
-                case UIState.GAME_FACTION_CONCEPT_INPUT:
-                    
-                    if (myFaction != null && !string.IsNullOrEmpty(myFaction.RawConcept))
-                    {
-                        mainButton.interactable = false;
-                    }
-                    break;
-                case UIState.GAME_FACTION_FLAW_INPUT:
-                    Faction anotherFaction = stateManager.AnotherFaction;
-                    if (anotherFaction != null && !string.IsNullOrEmpty(anotherFaction.RawFlaw))
-                    {
-                        mainButton.interactable = false;
-                    }
-                    break;
-                case UIState.GAME_ATTACK:
-                    if (myAttackMatch != null && !string.IsNullOrEmpty(myAttackMatch.AttackDescription))
-                    {
-                        mainButton.interactable = false;
-                    }
-                    break;
-                case UIState.GAME_DEFENSE:
-                    if (myDefenseMatch != null && !string.IsNullOrEmpty(myDefenseMatch.DefenseDescription))
-                    {
-                        mainButton.interactable = false;
-                    }
-                    break;
-                
+                dialogManager.CloseTopDialog();
             }
-        }
-    }
-
-    private void ConfigureInputField(UIState state, bool stateChanged = true)
-    {
-        Faction myFaction = stateManager.MyFaction;
-        Match myAttackMatch = stateManager.MyAttackMatch;
-        Match myDefenseMatch = stateManager.MyDefenseMatch;
-        if (stateChanged)
-        {
-            inputField.interactable = true;
-            inputField.text = string.Empty;
-
-            switch (state)
-            {
-                case UIState.GAME_CONTEXT_INPUT:
-                    if (!stateManager.IsLeader())
-                    {
-                        inputField.interactable = false;
-                    }
-                    break;
-                case UIState.GAME_FACTION_CONCEPT_INPUT:
-                case UIState.GAME_FACTION_FLAW_INPUT:
-                case UIState.GAME_ATTACK:
-                case UIState.GAME_DEFENSE:
-                    break;
-                default:
-                    inputField.interactable = false;
-                    break;
-            }
-        } else
-        {
-            switch (state)
-            {
-                case UIState.GAME_FACTION_CONCEPT_INPUT:
-                    if (myFaction != null && !string.IsNullOrEmpty(myFaction.RawConcept))
-                    {
-                        inputField.text = myFaction.RawConcept;
-                        inputField.interactable = false;
-                    }
-                    break;
-                case UIState.GAME_FACTION_FLAW_INPUT:
-                    Faction anotherFaction = stateManager.AnotherFaction;
-                    if (anotherFaction != null && !string.IsNullOrEmpty(anotherFaction.RawFlaw))
-                    {
-                        inputField.text = anotherFaction.RawFlaw;
-                        inputField.interactable = false;
-                    }
-                    break;
-                case UIState.GAME_ATTACK:
-                    if (myAttackMatch != null && !string.IsNullOrEmpty(myAttackMatch.AttackDescription))
-                    {
-                        inputField.text = myAttackMatch.AttackDescription;
-                        inputField.interactable = false;
-                    }
-                    break;
-                case UIState.GAME_DEFENSE:
-                    if (myDefenseMatch != null && !string.IsNullOrEmpty(myDefenseMatch.DefenseDescription))
-                    {
-                        inputField.text = myDefenseMatch.DefenseDescription;
-                        inputField.interactable = false;
-                    }
-                    break;
-            }
-        }
-        
+        );
     }
 
     private void OnReadyButtonClicked()
@@ -269,6 +309,11 @@ public class GameBasePanel : PersistentPanel
         bool isReady = myPlayer?.Ready ?? false;
         
         gameClient.SetReady(!isReady);
+    }
+
+    private void OnStartButtonClicked()
+    {
+        gameClient.GameStart();
     }
 
     private void OnSubmitContextButtonClicked()

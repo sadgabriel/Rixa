@@ -8470,11 +8470,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220 \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220
-    \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220 \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220
-    \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220 \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220
-    \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220 \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220
-    \uC9C4\uC601 \uC790\uC6D0 \uC11C\uC220 "
+  m_text: "- \uB300\uCDA9 \uC790\uC6D0 \uC774\uB984 1: \uB300\uCDA9 \uC790\uC6D0
+    \uC124\uBA85 \uB300\uCDA9 \uC790\uC6D0 \uC124\uBA85 \uB300\uCDA9 \uC790\uC6D0
+    \uC124\uBA85 \uB300\uCDA9 \uC790\uC6D0 \uC124\uBA85 \uB300\uCDA9 \uC790\uC6D0
+    \uC124\uBA85 "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9a78f99f5d171194498a566735ebd0aa, type: 2}
   m_sharedMaterial: {fileID: -5306203189330960349, guid: 9a78f99f5d171194498a566735ebd0aa, type: 2}

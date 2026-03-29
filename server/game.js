@@ -122,10 +122,6 @@ export class Game {
 
         const player = this.getPlayer(playerId);
         player.ready = ready;
-
-        if (this.players.every(p => p.ready) && this.players.length > 1) {
-            this.gameStart();
-        }
     }
 
     gameStart() {
@@ -133,6 +129,10 @@ export class Game {
 
         if (!this.players.every(p => p.ready)){
             throw new Errors.PlayersNotReadyError();
+        }
+
+        if (this.players.length < 2) {
+            throw new Errors.NotEnoughPlayersError();
         }
 
         this.round = 1;

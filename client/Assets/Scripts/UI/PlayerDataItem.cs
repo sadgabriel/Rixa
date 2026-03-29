@@ -64,7 +64,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
             scoreText.text = $"{faction.Score}";
         }
 
-        if (stateManager.CurrentUIState == UIState.GAME_LOBBY && player.Ready)
+        if (stateManager.CurrentUIState == UIState.GAME_LOBBY && player.Ready && !stateManager.IsFirst(playerId))
         {
             statusIndicator.ShowReady();
         }

@@ -216,6 +216,31 @@ public class StateManager : MonoBehaviour
         return true;
     }
 
+    public bool CanGameStart()
+    {
+        if (!IsInGame())
+        {
+            return false;
+        }
+
+        if (currentGameState?.Players == null || currentGameState.Players.Count < 2)
+        {
+            return false;
+        }
+
+        bool allReady = true;
+        for (int i = 1; i < currentGameState.Players.Count; i++)
+        {
+            if (!currentGameState.Players[i].Ready)
+            {
+                allReady = false;
+                break;
+            }
+        }
+
+        return allReady;
+    }
+
     public bool IsLeader()
     {
         if (!IsInGame())
@@ -229,6 +254,31 @@ public class StateManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    public bool IsFirst(string playerId = null)
+    {
+        if (playerId == null)
+        {
+            playerId = MyPlayer?.Id;
+        }
+
+        if (playerId == null)
+        {
+            return false;
+        }
+
+        if (!IsInGame())
+        {
+            return false;
+        }
+
+        if (currentGameState?.Players == null || currentGameState.Players.Count == 0)
+        {
+            return false;
+        }
+
+        return currentGameState.Players[0].Id == playerId;
     }
 
     public Player GetPlayerById(string playerId)

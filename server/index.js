@@ -210,6 +210,10 @@ async function handleGameSubmit(client, data) {
         case "unready":
             game.setReady(client.playerId, false);
             break;
+        case "start":
+            game.setReady(client.playerId, true);
+            game.gameStart();
+            break;
         case "context":
             game.submitContext(payload.contextDescription);
             break;

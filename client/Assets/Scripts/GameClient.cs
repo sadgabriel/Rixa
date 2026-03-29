@@ -104,6 +104,12 @@ public class GameClient : MonoBehaviour
         Submit(ready ? "ready" : "unready", new { });
     }
 
+    public void GameStart()
+    {
+        if (!IsConnected()) return;
+        Submit("start", new { });
+    }
+
     public void SubmitContext(string contextDescription)
     {
         if (!IsConnected()) return;
