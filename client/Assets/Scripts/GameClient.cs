@@ -292,7 +292,7 @@ public class GameClient : MonoBehaviour
         }
         
         if (gameState != null)
-        {
+        {            
             OnGameStateUpdated?.Invoke(gameState);
         }
     }

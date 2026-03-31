@@ -72,17 +72,11 @@ wss.on('connection', (ws) => {
             const game = idToGameMap.get(client.gameId);
             if (game != null) {
                 if (game.phase === GamePhase.LOBBY) {
-                    game.removePlayer(client.playerId);
-
-                    if (game.players.length === 0){
-                        idToGameMap.delete(game.id);
-                    }
-
-                    broadcastLobbyState();
-                    broadcastGameState(game);
+                    handleGameLeave(client, null);
                 } else {
                     for (const player of game.players) {
                         try {
+                            if (player.id === client.playerId) continue;
                             const playerClient = findClientByPlayerId(player.id);
                             playerClient.gameId = null;
                             playerClient.playerId = null;
@@ -165,6 +159,8 @@ function handleGameLeave(client, data) {
 
         if (game.players.length === 0){
             idToGameMap.delete(game.id);
+        } else {
+            broadcastGameState(game);
         }
     } else {
         throw new Errors.NotInGameError(client.id);
@@ -324,8 +320,16 @@ function broadcast(type, data) {
 
 function broadcastToGame(game, type, data) {
     for (const playerId of game.players.map(player => player.id)){
-        const client = findClientByPlayerId(playerId);
-        client.sendMessage(type, data);
+        try {
+            const client = findClientByPlayerId(playerId);
+            if (client.isConnected()) {
+                client.sendMessage(type, data);
+            }
+        } catch (error) {
+            if (!(error instanceof Errors.PlayerNotFoundError)) {
+                console.error(`Error broadcasting to player ${playerId}:`, error);
+            }
+        }
     }
 }
 

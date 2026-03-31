@@ -51,11 +51,12 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         if (string.IsNullOrEmpty(playerId)) return;
 
         Player player = stateManager.GetPlayerById(playerId);
-        if (player != null)
+        if (player == null)
         {
-            playerNameText.text = player.Name;
+            statusIndicator.Hide();
+            return;
         }
-        
+        playerNameText.text = player.Name;
 
         Faction faction = stateManager.GetFactionById(player.FactionId);
         if (faction != null)

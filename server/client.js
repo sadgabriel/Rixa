@@ -12,7 +12,8 @@ export class Client {
 
     send(message) {
         if (this.socket.readyState !== WebSocket.OPEN) {
-            throw new Errors.SocketNotOpenError(this.id);
+            console.warn(`Cannot send message to client ${this.id} because the connection is not open.`);
+            return;
         }
 
         this.socket.send(message, (error) => {
