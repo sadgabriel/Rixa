@@ -336,6 +336,9 @@ export class Game {
 
             if (!attackerWins) continue;
 
+            const attackerFaction = this.getFaction(match.attackerId);
+            attackerFaction.score += 1;
+
             const defenderFaction = this.getFaction(match.defenderId);
 
             const resourceNames = defenderFaction.resources.map(r => r.name);

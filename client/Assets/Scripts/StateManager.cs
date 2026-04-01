@@ -76,7 +76,7 @@ public class StateManager : MonoBehaviour
         {
             UIState oldState = currentUIState;
             currentUIState = value;
-            OnUIStateUpdated?.Invoke(currentUIState, oldState != currentUIState);
+            SafeInvokeEvent(OnUIStateUpdated, currentUIState, oldState != currentUIState, "OnUIStateUpdated");
         }
     }
 
@@ -386,24 +386,62 @@ public class StateManager : MonoBehaviour
         CurrentUIState = UIState.IDLE;
     }
 
+    private void SafeInvokeEvent<T>(Action<T> eventAction, T arg, string eventName)
+    {
+        if (eventAction == null) return;
+        
+        foreach (Action<T> handler in eventAction.GetInvocationList())
+        {
+            try
+            {
+                handler.Invoke(arg);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{eventName}] Error in {handler.Method.DeclaringType?.Name}.{handler.Method.Name}:");
+                Debug.LogError($"  {e.Message}");
+                Debug.LogError($"  {e.StackTrace}");
+            }
+        }
+    }
+
+    private void SafeInvokeEvent<T1, T2>(Action<T1, T2> eventAction, T1 arg1, T2 arg2, string eventName)
+    {
+        if (eventAction == null) return;
+        
+        foreach (Action<T1, T2> handler in eventAction.GetInvocationList())
+        {
+            try
+            {
+                handler.Invoke(arg1, arg2);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{eventName}] Error in {handler.Method.DeclaringType?.Name}.{handler.Method.Name}:");
+                Debug.LogError($"  {e.Message}");
+                Debug.LogError($"  {e.StackTrace}");
+            }
+        }
+    }
+
     private void HandleClientStateUpdated(ClientState state)
     {
         CurrentClientState = state;
         RecomputeUIState();
-        OnClientStateUpdated?.Invoke(state);
+        SafeInvokeEvent(OnClientStateUpdated, state, "OnClientStateUpdated");
     }
 
     private void HandleLobbyStateUpdated(LobbyState state)
     {
         CurrentLobbyState = state;
         RecomputeUIState();
-        OnLobbyStateUpdated?.Invoke(state);
+        SafeInvokeEvent(OnLobbyStateUpdated, state, "OnLobbyStateUpdated");
     }
 
     private void HandleGameStateUpdated(GameState state)
     {
         CurrentGameState = state;
         RecomputeUIState();
-        OnGameStateUpdated?.Invoke(state);
+        SafeInvokeEvent(OnGameStateUpdated, state, "OnGameStateUpdated");
     }
 }

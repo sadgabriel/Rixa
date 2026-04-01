@@ -44,9 +44,16 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
 
     private void Refresh()
     {
+        UIState currentState = stateManager.CurrentUIState;
+        if (currentState == UIState.GAME_COMPETITION_CALCULATE)
+        {
+            statusIndicator.Hide();
+            return;
+        }
+
         playerNameText.text = "-";
         factionNameText.text = "-";
-        scoreText.text = "0";
+        scoreText.text = "-";
 
         if (string.IsNullOrEmpty(playerId)) return;
 
