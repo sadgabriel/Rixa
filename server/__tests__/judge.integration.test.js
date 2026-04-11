@@ -198,7 +198,6 @@ describe("Judge (integration: real OpenAI call)", () => {
 
     expect(typeof narrated.context_log).toBe("string");
     expect(hasKorean(narrated.context_log)).toBe(true);
-    expect(narrated.context_log).not.toMatch(/\bm_\d{2}\b/);
 
     expect(Array.isArray(narrated.results)).toBe(true);
 

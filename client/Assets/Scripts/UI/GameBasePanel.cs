@@ -225,7 +225,7 @@ public class GameBasePanel : PersistentPanel
         switch (state)
         {
             case UIState.GAME_CONTEXT_INPUT:
-                return stateManager.CurrentGameState?.Context?.RawContextDescription != null;
+                return !stateManager.IsLeader() ||stateManager.CurrentGameState?.Context?.RawContextDescription != null;
             case UIState.GAME_FACTION_CONCEPT_INPUT:
                 return myFaction != null && !string.IsNullOrEmpty(myFaction.RawConcept);
             case UIState.GAME_FACTION_FLAW_INPUT:
