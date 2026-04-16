@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const scenarioFilename = "test_scenario_2.json";
 
 function hasKorean(text) {
   if (typeof text !== "string") return false;
@@ -57,7 +58,7 @@ describe("Judge (integration: real OpenAI call)", () => {
   jest.setTimeout(90_000);
 
   test("E2E: setupContext -> analyzeCompetition -> narrateCompetition (single session)", async () => {
-    const scenario = loadTestScenario("test_scenario_1.json");
+    const scenario = loadTestScenario(scenarioFilename);
     
     const judge = new Judge({ useState: false, store: false });
     judge.resetSession();
