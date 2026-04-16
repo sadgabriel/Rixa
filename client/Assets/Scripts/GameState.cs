@@ -26,6 +26,12 @@ public class Player
 
     [JsonProperty("ready")]
     public bool Ready { get; set; }
+
+    [JsonProperty("contextSetupFinishReady")]
+    public bool ContextSetupFinishReady { get; set; }
+
+    [JsonProperty("competitionFinishReady")]
+    public bool CompetitionFinishReady { get; set; }
 }
 
 public class Faction

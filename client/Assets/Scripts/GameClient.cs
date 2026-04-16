@@ -138,6 +138,10 @@ public class GameClient : MonoBehaviour
             factionFlawDescription
         });
     }
+    public void SetContextSetupFinishReady()
+    {
+        Submit("contextSetupFinishReady", new { });
+    }
 
     public void SubmitAttack(string attackDescription)
     {
@@ -155,6 +159,11 @@ public class GameClient : MonoBehaviour
         {
             defenseDescription
         });
+    }
+
+    public void SetCompetitionFinishReady()
+    {
+        Submit("competitionFinishReady", new { });
     }
 
     private void Submit(string kind, object payload)

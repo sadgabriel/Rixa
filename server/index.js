@@ -224,10 +224,10 @@ async function handleGameSubmit(client, data) {
             if (game.phase === GamePhase.CONTEXT_SETUP){
                 broadcastGameState(game);
                 await game.setupContext();
-                broadcastGameState(game);
-                await sleep(10000);
-                    game.endContextSetupFinish();
             }
+            break;
+        case "contextSetupFinishReady":
+            game.setContextSetupFinishReady(client.playerId);
             break;
         case "attack":
             factionId = game.getFactionByPlayerId(client.playerId).id;
@@ -243,14 +243,14 @@ async function handleGameSubmit(client, data) {
 
                 broadcastGameState(game);
                 await game.narrateCompetition();
-
+            }
+            break;
+        case "competitionFinishReady":
+            game.setCompetitionFinishReady(client.playerId);
+            if (game.phase === GamePhase.END) {
                 broadcastGameState(game);
-                await sleep(10000);
-                game.endCompetitionFinish();
-                if (game.phase === GamePhase.END) {
-                    await sleep(10000);
-                    game.reset();
-                }
+                await sleep(5000);
+                game.reset();
             }
             break;
     }

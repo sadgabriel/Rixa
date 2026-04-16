@@ -219,8 +219,19 @@ export class Game {
         this.phase = GamePhase.CONTEXT_SETUP_FINISH;
     }
 
+    setContextSetupFinishReady(playerId){
+        this._checkPhase(GamePhase.CONTEXT_SETUP_FINISH);
+        const player = this.getPlayer(playerId);
+        player.contextSetupFinishReady = true;
+
+        if (this.players.every(p => p.contextSetupFinishReady)) {
+            this.endContextSetupFinish();
+        }
+    }
+
     endContextSetupFinish() {
         this._checkPhase(GamePhase.CONTEXT_SETUP_FINISH);
+        this.players.forEach(p => p.contextSetupFinishReady = false);
         this.phase = GamePhase.ATTACK;
     }
 
@@ -380,8 +391,18 @@ export class Game {
         this.phase = GamePhase.COMPETITION_FINISH;
     }
 
+    setCompetitionFinishReady(playerId){
+        this._checkPhase(GamePhase.COMPETITION_FINISH);
+        const player = this.getPlayer(playerId);
+        player.competitionFinishReady = true;
+        if (this.players.every(p => p.competitionFinishReady)) {
+            this.endCompetitionFinish();
+        }
+    }
+
     endCompetitionFinish() {
         this._checkPhase(GamePhase.COMPETITION_FINISH);
+        this.players.forEach(p => p.competitionFinishReady = false);
         if (this.round >= TOTAL_ROUNDS) {
             this.phase = GamePhase.END;
         } else {
@@ -405,6 +426,8 @@ export class Game {
         for (const player of this.idToPlayerMap.values()) {
             player.factionId = null;
             player.ready = false;
+            player.contextSetupFinishReady = false;
+            player.competitionFinishReady = false;
         }
     }
 }

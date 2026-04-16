@@ -110,11 +110,19 @@ public class GameBasePanel : PersistentPanel
             case UIState.GAME_FACTION_FLAW_INPUT:
                 mainButton.onClick.AddListener(OnSubmitFactionFlawButtonClicked);
                 break;
+            case UIState.GAME_CONTEXT_SETUP_FINISH:
+                buttonText.text = "준비 완료";
+                mainButton.onClick.AddListener(OnContextSetupFinishButtonClicked);
+                break;
             case UIState.GAME_ATTACK:
                 mainButton.onClick.AddListener(OnSubmitAttackButtonClicked);
                 break;
             case UIState.GAME_DEFENSE:
                 mainButton.onClick.AddListener(OnSubmitDefenseButtonClicked);
+                break;
+            case UIState.GAME_COMPETITION_FINISH:
+                buttonText.text = "준비 완료";
+                mainButton.onClick.AddListener(OnCompetitionFinishButtonClicked);
                 break;
             default:
                 mainButton.interactable = false;
@@ -172,6 +180,12 @@ public class GameBasePanel : PersistentPanel
             return;
         }
         
+        if (state == UIState.GAME_CONTEXT_SETUP_FINISH || state == UIState.GAME_COMPETITION_FINISH)
+        {
+            UpdateReadyButton(state);
+            return;
+        }
+        
         UpdateSubmitButton(state);
     }
 
@@ -195,6 +209,34 @@ public class GameBasePanel : PersistentPanel
             buttonText.text = isReady ? "준비 취소" : "준비";
             mainButton.onClick.AddListener(OnReadyButtonClicked);
         }
+    }
+
+    private void UpdateReadyButton(UIState state)
+    {
+        GameState gameState = stateManager.CurrentGameState;
+        if (gameState?.Players == null) return;
+        
+        var buttonText = mainButton.GetComponentInChildren<TextMeshProUGUI>();
+        
+        int readyCount = 0;
+        int totalCount = gameState.Players.Count;
+        
+        foreach (var player in gameState.Players)
+        {
+            bool isReady = state == UIState.GAME_CONTEXT_SETUP_FINISH
+                ? player.ContextSetupFinishReady
+                : player.CompetitionFinishReady;
+                
+            if (isReady) readyCount++;
+        }
+        
+        buttonText.text = $"다음 ({readyCount}/{totalCount})";
+        
+        bool hasMyPlayerReady = state == UIState.GAME_CONTEXT_SETUP_FINISH
+            ? (stateManager.MyPlayer?.ContextSetupFinishReady ?? false)
+            : (stateManager.MyPlayer?.CompetitionFinishReady ?? false);
+            
+        mainButton.interactable = !hasMyPlayerReady;
     }
 
     private void UpdateSubmitButton(UIState state)
@@ -369,6 +411,11 @@ public class GameBasePanel : PersistentPanel
         gameClient.SubmitFactionFlaw(stateManager.AnotherFaction.Id, flaw);
     }
 
+    private void OnContextSetupFinishButtonClicked()
+    {
+        gameClient.SetContextSetupFinishReady();
+    }
+
     private void OnSubmitAttackButtonClicked()
     {
         string attack = inputField.text.Trim();
@@ -389,5 +436,10 @@ public class GameBasePanel : PersistentPanel
             return;
         }
         gameClient.SubmitDefense(defense);
+    }
+
+    private void OnCompetitionFinishButtonClicked()
+    {
+        gameClient.SetCompetitionFinishReady();
     }
 }
