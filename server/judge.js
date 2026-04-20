@@ -22,7 +22,7 @@ export class Judge {
         this.previousResponseId = null;
 
         this.options = {
-            model:  options.model ?? "gpt-5-nano",
+            model:  options.model ?? "gpt-5.4-nano",
             useState: options.useState ?? false,
             store: options.store ?? false,
         };

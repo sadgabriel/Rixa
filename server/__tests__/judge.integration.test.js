@@ -7,17 +7,32 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const scenarioFilename = "test_scenario_2.json";
+const scenarioFilename = "test_scenario_5.json";
+const resultFilename = "test_result.txt";
 
 function hasKorean(text) {
   if (typeof text !== "string") return false;
   return /[가-힣]/.test(text);
 }
 
+function writeToResult(content) {
+  const resultPath = path.join(__dirname, resultFilename);
+  fs.appendFileSync(resultPath, content + "\n", "utf-8");
+}
+
+function clearResultFile() {
+  const resultPath = path.join(__dirname, resultFilename);
+  fs.writeFileSync(resultPath, "", "utf-8");
+}
+
 function dumpParsed(title, obj) {
-  console.log(`\n===== output_parsed (${title}) =====\n`);
-  console.log(JSON.stringify(obj, null, 2));
-  console.log("\n===================================\n");
+  const separator = "=".repeat(80);
+  const header = `\n${separator}\n${title.toUpperCase()}\n${separator}\n`;
+  const content = JSON.stringify(obj, null, 2);
+  const output = header + content + "\n";
+  
+  console.log(output);
+  writeToResult(output);
 }
 
 function toContextAndFactionsFromSetup(setup) {
@@ -55,7 +70,14 @@ function loadTestScenario(filename) {
 }
 
 describe("Judge (integration: real OpenAI call)", () => {
-  jest.setTimeout(90_000);
+  jest.setTimeout(30_000);
+
+  beforeAll(() => {
+    clearResultFile();
+    const scenario = loadTestScenario(scenarioFilename);
+    const header = `${"=".repeat(80)}\nTEST SCENARIO: ${scenario.name}\n${"=".repeat(80)}\n`;
+    writeToResult(header);
+  });
 
   test("E2E: setupContext -> analyzeCompetition -> narrateCompetition (single session)", async () => {
     const scenario = loadTestScenario(scenarioFilename);
@@ -76,7 +98,7 @@ describe("Judge (integration: real OpenAI call)", () => {
 
     const setup = await judge.setupContext(inputContext, inputFactions);
 
-    dumpParsed("context_setup", setup);
+    dumpParsed("CONTEXT SETUP", setup);
 
     expect(setup).toBeDefined();
     expect(setup.phase).toBe("context_setup");
@@ -139,7 +161,7 @@ describe("Judge (integration: real OpenAI call)", () => {
     ];
 
     const analyzed = await judge.analyzeCompetition(context, factions, matchesForAnalyze);
-    dumpParsed("competition_analyze", analyzed);
+    dumpParsed("COMPETITION ANALYZE", analyzed);
 
     expect(analyzed).toBeDefined();
     expect(analyzed.phase).toBe("competition_analyze");
@@ -192,7 +214,7 @@ describe("Judge (integration: real OpenAI call)", () => {
     expect(fac1ResNames.includes(matchesForNarrate[1].lostResource)).toBe(true);
 
     const narrated = await judge.narrateCompetition(context, factions, matchesForNarrate);
-    dumpParsed("competition_narrate", narrated);
+    dumpParsed("COMPETITION NARRATE", narrated);
 
     expect(narrated).toBeDefined();
     expect(narrated.phase).toBe("competition_narrate");
@@ -212,5 +234,8 @@ describe("Judge (integration: real OpenAI call)", () => {
       expect(hasKorean(item.display_narrative)).toBe(true);
       expect(item.display_narrative).not.toMatch(/\bm_\d{2}\b/);
     }
+
+    const footer = `\n${"=".repeat(80)}\nTEST COMPLETED SUCCESSFULLY\n${"=".repeat(80)}\n`;
+    writeToResult(footer);
   });
 });

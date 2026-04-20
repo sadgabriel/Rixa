@@ -35,7 +35,7 @@
         "display_narrative": {
           "type": "string",
           "minLength": 150,
-          "maxLength": 300,
+          "maxLength": 350,
           "description": "Player-facing narrative reflecting the resolved outcome and given resource changes."
         }
       }

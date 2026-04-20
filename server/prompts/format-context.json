@@ -18,7 +18,7 @@
           "summary": {
             "type": "string",
             "minLength": 60,
-            "maxLength": 200,
+            "maxLength": 250,
             "description": "Finalized competitive context (world/background/stage) description."
           }
         }
@@ -47,7 +47,7 @@
           "summary": {
             "type": "string",
             "minLength": 40,
-            "maxLength": 150,
+            "maxLength": 250,
             "description": "Finalized faction description. Should naturally include the faction name."
           },
           "resources": {
@@ -67,8 +67,8 @@
                 },
                 "description": {
                   "type": "string",
-                  "minLength": 15,
-                  "maxLength": 40,
+                  "minLength": 10,
+                  "maxLength": 60,
                   "description": "What this resource represents and why it matters as abstract capacity."
                 }
               }

@@ -77,7 +77,7 @@ public class DevCheats : MonoBehaviour
                 Debug.Log($"[DevCheat] {faction.name} submitted context");
                 break;
             case UIState.GAME_FACTION_CONCEPT_INPUT:
-                client.SubmitFactionConcept(faction.concept, faction.conceptName);
+                client.SubmitFactionConcept(faction.concept, faction.name);
                 Debug.Log($"[DevCheat] {faction.name} submitted concept");
                 break;
             case UIState.GAME_FACTION_FLAW_INPUT:
