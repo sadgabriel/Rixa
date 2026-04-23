@@ -9,8 +9,6 @@ public class GameCompetitionFinishPanel : NonPersistentPanel
     [SerializeField] private TextMeshProUGUI DefenseNameText;
     [SerializeField] private TextMeshProUGUI AttackDescriptionText;
     [SerializeField] private TextMeshProUGUI DefenseDescriptionText;
-    [SerializeField] private TextMeshProUGUI AttackResultText;
-    [SerializeField] private TextMeshProUGUI DefenseResultText;
 
     private void OnEnable()
     {
@@ -21,28 +19,24 @@ public class GameCompetitionFinishPanel : NonPersistentPanel
         {
             string DefenderPlayerName = stateManager.GetPlayerByFactionId(myAttackMatch.DefenderId)?.Name;
             AttackNameText.text = $"{DefenderPlayerName}에 대한 공격 결과";
-            AttackDescriptionText.text = myAttackMatch.DisplayNarrative;
-            AttackResultText.text = GetOutcomeText(myAttackMatch);
+            AttackDescriptionText.text = myAttackMatch.DisplayNarrative + "\n\n" + GetOutcomeText(myAttackMatch);
         }
         else
         {
             AttackNameText.text = "알 수 없는 공격 결과";
             AttackDescriptionText.text = "";
-            AttackResultText.text = "";
         }
 
         if (myDefenseMatch != null)
         {
             string AttackerPlayerName = stateManager.GetPlayerByFactionId(myDefenseMatch.AttackerId)?.Name;
             DefenseNameText.text = $"{AttackerPlayerName}(으)로부터의 공격 결과";
-            DefenseDescriptionText.text = myDefenseMatch.DisplayNarrative;
-            DefenseResultText.text = GetOutcomeText(myDefenseMatch);
+            DefenseDescriptionText.text = myDefenseMatch.DisplayNarrative + "\n\n" + GetOutcomeText(myDefenseMatch);
         }
         else
         {
             DefenseNameText.text = "알 수 없는 방어 결과";
             DefenseDescriptionText.text = "";
-            DefenseResultText.text = "";
         }
     }
 
