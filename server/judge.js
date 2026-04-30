@@ -192,51 +192,77 @@ export class Judge {
     }
 
     async _callWithFormat(developerText, userText, outputFormat) {
-        try {
-            const request = {
-                model: this.options.model,
-                reasoning: { effort: "low" },
-                store: this.options.store,
-                input: [
-                    { role: "developer", content: developerText },
-                    { role: "user", content: userText },
-                ],
-            };
+        const MAX_RETRIES = 2;
+        const TIMEOUT_MS = 15000;
 
-            if (this.options.useState && this.previousResponseId !== null) {
-                request.previous_response_id = this.previousResponseId;
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                const request = {
+                    model: this.options.model,
+                    reasoning: { effort: "low" },
+                    store: this.options.store,
+                    input: [
+                        { role: "developer", content: developerText },
+                        { role: "user", content: userText },
+                    ],
+                };
+
+                if (this.options.useState && this.previousResponseId !== null) {
+                    request.previous_response_id = this.previousResponseId;
+                }
+
+                request.text = {
+                    format: {
+                        type: "json_schema",
+                        name: outputFormat.title ?? "structured_output",
+                        strict: true,
+                        schema: outputFormat,
+                    },
+                };
+
+                const response = await Promise.race([
+                    this.client.responses.parse(request),
+                    new Promise((_, reject) =>
+                        setTimeout(
+                            () => reject(new Error(`Timeout after ${TIMEOUT_MS}ms`)),
+                            TIMEOUT_MS
+                        )
+                    ),
+                ]);
+
+                if (this.options.useState) {
+                    this.previousResponseId = response.id ?? null;
+                } else {
+                    this.previousResponseId = null;
+                }
+
+                if (response.output_parsed != null) {
+                    return response.output_parsed;
+                }
+
+                const snippet = (response.output_text ?? "").slice(0, 300);
+                throw new Errors.InvalidJudgeResponseError(
+                    `No output_parsed (parse). output_text snippet: ${JSON.stringify(snippet)}`
+                );
+
+            } catch (error) {
+                if (error instanceof Errors.InvalidJudgeResponseError) {
+                    throw error;
+                }
+
+                const isLastAttempt = attempt === MAX_RETRIES;
+                if (isLastAttempt) {
+                    throw new Errors.JudgeCallError(
+                        `Failed after ${MAX_RETRIES} attempts. Last error: ${error.message}`
+                    );
+                }
+
+                const delay = 1000 * Math.pow(2, attempt - 1);
+                console.warn(
+                    `[Judge] Attempt ${attempt} failed (${error.message}). Retrying in ${delay}ms...`
+                );
+                await new Promise((r) => setTimeout(r, delay));
             }
-
-            request.text = {
-                format: {
-                    type: "json_schema",
-                    name: outputFormat.title ?? "structured_output",
-                    strict: true,
-                    schema: outputFormat,
-                },
-            };
-
-            const response = await this.client.responses.parse(request);
-            
-            if (this.options.useState) {
-                this.previousResponseId = response.id ?? null;
-            } else {
-                this.previousResponseId = null;
-            }
-
-            if (response.output_parsed != null) {
-                return response.output_parsed;
-            }
-
-            const snippet = (response.output_text ?? "").slice(0, 300);
-            throw new Errors.InvalidJudgeResponseError(
-                `No output_parsed (parse). output_text snippet: ${JSON.stringify(snippet)}`
-            );
-        } catch (error) {
-            if (error instanceof Errors.InvalidJudgeResponseError) {
-                throw error;
-            }
-            throw new Errors.JudgeCallError(error.message);
         }
     }
 }
