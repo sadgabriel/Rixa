@@ -12446,7 +12446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c2a9e2a18a8a1e4c890d2252ae0d0c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WsClient
-  serverUrl: ws://localhost:7363
+  serverUrl: ws://211.220.5.29:7363
 --- !u!4 &2053907155
 Transform:
   m_ObjectHideFlags: 0

@@ -21,7 +21,7 @@ public class WsClient : MonoBehaviour
         }
     }
 
-    [SerializeField] private string serverUrl = "ws://localhost:7363";
+    private string serverUrl = "ws://211.220.5.29:7363";
     private NativeWebSocket.WebSocket ws;
 
     public event Action<string, JToken> OnMessage;
@@ -43,6 +43,8 @@ public class WsClient : MonoBehaviour
             return;
         }
         DontDestroyOnLoad(gameObject);
+
+        LoadConfig();
         Initialize();
     }
 
@@ -138,4 +140,29 @@ public class WsClient : MonoBehaviour
             }
         };
     }
+
+    private void LoadConfig()
+    {
+        try
+        {
+            string path = System.IO.Path.Combine(Application.streamingAssetsPath, "config.json");
+            string json = System.IO.File.ReadAllText(path);
+            var config = JsonUtility.FromJson<WsConfig>(json);
+            if (!string.IsNullOrEmpty(config.serverUrl))
+            {
+                serverUrl = config.serverUrl;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"config.json 로드 실패, 기본값 사용: {e.Message}");
+        }
+    }
+
+    [Serializable]
+    private class WsConfig
+    {
+        public string serverUrl;
+    }
 }
+
