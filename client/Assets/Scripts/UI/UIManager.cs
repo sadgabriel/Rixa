@@ -87,6 +87,15 @@ public class UIManager : MonoBehaviour
 
         UIContext nextContext = GetContext(nextState);
 
+        if (nextContext == UIContext.APP)
+        {
+            AudioManager.Instance.PlayLobbyBGM();
+        }
+        else if (nextContext == UIContext.GAME)
+        {
+            AudioManager.Instance.PlayGameBGM();
+        }
+
         if (nextContext != currentContext)
         {
             Debug.Log($"[UIManager] Context changed: {currentContext} → {nextContext}");

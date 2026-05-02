@@ -54,7 +54,20 @@ public class DialogManager : MonoBehaviour
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
-                CloseTopDialog();
+                if (IsDialogOpen)
+                {
+                    CloseTopDialog();
+                } else
+                {
+                    ShowConfirmationDialog("게임에서 나가시겠습니까?", () =>
+                    {
+                        Application.Quit();
+                        CloseTopDialog();
+                    }, () =>
+                    {
+                        CloseTopDialog();
+                    });
+                }
             } else if (Keyboard.current.enterKey.wasPressedThisFrame)
             {
                 if (IsDialogOpen)
