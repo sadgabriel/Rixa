@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 
 public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
@@ -9,6 +11,9 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
     [SerializeField] private TMPro.TextMeshProUGUI factionNameText;
     [SerializeField] private TMPro.TextMeshProUGUI scoreText;
     [SerializeField] private StatusIndicator statusIndicator;
+    [SerializeField] private Image attackIcon;
+    [SerializeField] private Image defenseIcon;
+    [SerializeField] private GameObject bothIcons;
 
     private string playerId;
     private StateManager stateManager;
@@ -25,6 +30,9 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
     private void OnEnable()
     {
         stateManager.OnGameStateUpdated += HandleGameStateUpdated;
+        attackIcon.gameObject.SetActive(false);
+        defenseIcon.gameObject.SetActive(false);
+        bothIcons.SetActive(false);
         Refresh();
     }
 
@@ -72,6 +80,29 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         {
             factionNameText.text = string.IsNullOrEmpty(faction.Name) ? "-" : faction.Name;
             scoreText.text = $"{faction.Score}";
+        }
+
+        if (currentState == UIState.GAME_ATTACK)
+        {
+            attackIcon.gameObject.SetActive(false);
+            defenseIcon.gameObject.SetActive(false);
+            bothIcons.SetActive(false);
+
+            Match attackMatch = stateManager.MyAttackMatch;
+            Match defenseMatch = stateManager.MyDefenseMatch;
+
+            if (attackMatch.DefenderId == faction.Id && defenseMatch.AttackerId == faction.Id)
+            {
+                bothIcons.SetActive(true);
+            }
+            else if (attackMatch.DefenderId == faction.Id)
+            {
+                defenseIcon.gameObject.SetActive(true);
+            }
+            else if (defenseMatch.AttackerId == faction.Id)
+            {
+                attackIcon.gameObject.SetActive(true);
+            }
         }
 
         if (stateManager.CurrentUIState == UIState.GAME_LOBBY && player.Ready && !stateManager.IsFirst(playerId))

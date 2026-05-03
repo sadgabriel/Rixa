@@ -59,7 +59,7 @@ public class DialogManager : MonoBehaviour
                     CloseTopDialog();
                 } else
                 {
-                    ShowConfirmationDialog("게임에서 나가시겠습니까?", () =>
+                    ShowConfirmationDialog("게임을 종료하시겠습니까?", () =>
                     {
                         Application.Quit();
                         CloseTopDialog();
