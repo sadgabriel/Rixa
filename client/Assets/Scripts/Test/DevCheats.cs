@@ -12,7 +12,9 @@ public class DevCheats : MonoBehaviour
     
     private void Start()
     {
+    #if DEVELOPMENT_BUILD || UNITY_EDITOR
         LoadScenario();
+    #endif
     }
     
     private void LoadScenario()
@@ -38,17 +40,12 @@ public class DevCheats : MonoBehaviour
     
     private void Update()
     {
+    #if DEVELOPMENT_BUILD || UNITY_EDITOR
         if (scenario == null || Keyboard.current == null) return;
-        
-        if (Keyboard.current.f1Key.wasPressedThisFrame)
-        {
-            AutoSubmit(faction1Index);
-        }
-        
-        if (Keyboard.current.f2Key.wasPressedThisFrame)
-        {
-            AutoSubmit(faction2Index);
-        }
+
+        if (Keyboard.current.f1Key.wasPressedThisFrame) AutoSubmit(faction1Index);
+        if (Keyboard.current.f2Key.wasPressedThisFrame) AutoSubmit(faction2Index);
+    #endif
     }
     
     private void AutoSubmit(int factionIndex)
