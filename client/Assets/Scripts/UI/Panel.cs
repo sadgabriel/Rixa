@@ -8,12 +8,14 @@ public abstract class Panel : MonoBehaviour
     protected StateManager stateManager;
     protected DialogManager dialogManager;
     protected GameClient gameClient;
+    protected AudioManager audioManager;
 
     protected virtual void Awake()
     {
         stateManager = StateManager.Instance;
         dialogManager = DialogManager.Instance;
         gameClient = GameClient.Instance;
+        audioManager = AudioManager.Instance;
     }
 
     public virtual void Show()

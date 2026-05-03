@@ -4745,7 +4745,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -5196,7 +5196,7 @@ MonoBehaviour:
   sfxSource: {fileID: 663025261}
   lobbyBGM: {fileID: 8300000, guid: 1c7eeb3cdd7bdfe4699ebf5fac781bba, type: 3}
   gameBGM: {fileID: 8300000, guid: 3208be797b1b52940a8ef2a24330218f, type: 3}
-  buttonClickSFX: {fileID: 8300000, guid: 1c7eeb3cdd7bdfe4699ebf5fac781bba, type: 3}
+  buttonClickSFX: {fileID: 8300000, guid: 31e660905b569134bb64a39fd0688407, type: 3}
 --- !u!4 &797123651
 Transform:
   m_ObjectHideFlags: 0

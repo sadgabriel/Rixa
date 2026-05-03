@@ -333,15 +333,18 @@ public class GameBasePanel : PersistentPanel
 
     public void OnExitButtonClicked()
     {
+        audioManager.PlayButtonClick();
         dialogManager.ShowConfirmationDialog(
             "게임에서 나가시겠습니까?",
             onConfirm: () =>
             {
                 gameClient.LeaveGame();
+                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             },
             onCancel: () =>
             {
+                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             }
         );
@@ -349,6 +352,7 @@ public class GameBasePanel : PersistentPanel
 
     private void OnReadyButtonClicked()
     {
+        audioManager.PlayButtonClick();
         Player myPlayer = stateManager.MyPlayer;
         bool isReady = myPlayer?.Ready ?? false;
         
@@ -357,11 +361,13 @@ public class GameBasePanel : PersistentPanel
 
     private void OnStartButtonClicked()
     {
+        audioManager.PlayButtonClick();
         gameClient.GameStart();
     }
 
     private void OnSubmitContextButtonClicked()
     {
+        audioManager.PlayButtonClick();
         string context = inputField.text.Trim();
         if (string.IsNullOrEmpty(context))
         {
@@ -374,16 +380,18 @@ public class GameBasePanel : PersistentPanel
 
     private void OnSubmitFactionConceptButtonClicked()
     {
+        audioManager.PlayButtonClick();
         string concept = inputField.text.Trim();
         if (string.IsNullOrEmpty(concept))
         {
             Debug.LogWarning("Faction concept input is empty");
             return;
         }
-
+        
         dialogManager.ShowFactionNameInputDialog(
             onConfirm: factionName =>
             {
+                audioManager.PlayButtonClick();
                 if (string.IsNullOrEmpty(factionName))
                 {
                     Debug.LogWarning("Faction name input is empty");
@@ -394,6 +402,7 @@ public class GameBasePanel : PersistentPanel
             },
             onCancel: () =>
             {
+                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             }
         );
@@ -401,6 +410,7 @@ public class GameBasePanel : PersistentPanel
 
     private void OnSubmitFactionFlawButtonClicked()
     {
+        audioManager.PlayButtonClick();
         string flaw = inputField.text.Trim();
         if (string.IsNullOrEmpty(flaw))
         {
@@ -413,11 +423,13 @@ public class GameBasePanel : PersistentPanel
 
     private void OnContextSetupFinishButtonClicked()
     {
+        audioManager.PlayButtonClick();
         gameClient.SetContextSetupFinishReady();
     }
 
     private void OnSubmitAttackButtonClicked()
     {
+        audioManager.PlayButtonClick();
         string attack = inputField.text.Trim();
         if (string.IsNullOrEmpty(attack))
         {
@@ -429,6 +441,7 @@ public class GameBasePanel : PersistentPanel
 
     private void OnSubmitDefenseButtonClicked()
     {
+        audioManager.PlayButtonClick();
         string defense = inputField.text.Trim();
         if (string.IsNullOrEmpty(defense))
         {
@@ -440,6 +453,7 @@ public class GameBasePanel : PersistentPanel
 
     private void OnCompetitionFinishButtonClicked()
     {
+        audioManager.PlayButtonClick();
         gameClient.SetCompetitionFinishReady();
     }
 }

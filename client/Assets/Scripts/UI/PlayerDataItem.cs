@@ -13,11 +13,13 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
     private string playerId;
     private StateManager stateManager;
     private DialogManager dialogManager;
+    private AudioManager audioManager;
 
     private void Awake()
     {
         stateManager = StateManager.Instance;
         dialogManager = DialogManager.Instance;
+        audioManager = AudioManager.Instance;
     }
 
     private void OnEnable()
@@ -116,6 +118,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        audioManager.PlayButtonClick();
         if (string.IsNullOrEmpty(playerId)) return;
 
         Player player = stateManager.GetPlayerById(playerId);
@@ -132,6 +135,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         {
             dialogManager.ShowFactionDialog(factionName, factionDescription, resources[0].Name, resources[0].Count, resources[1].Name, resources[1].Count, resources[2].Name, resources[2].Count, () =>
             {
+                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             });
         }
@@ -139,6 +143,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         {
             dialogManager.ShowFactionDialog(factionName, factionDescription, "자원명 1", 0, "자원명 2", 0, "자원명 3", 0, () =>
             {
+                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             });
         }
