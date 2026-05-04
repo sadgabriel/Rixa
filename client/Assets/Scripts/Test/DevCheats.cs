@@ -5,18 +5,21 @@ using Newtonsoft.Json;
 public class DevCheats : MonoBehaviour
 {
     [SerializeField] private TextAsset testScenarioFile;
-    
+
     private TestScenario scenario;
-    private int faction1Index = 0;
-    private int faction2Index = 1;
-    
+
+    private static readonly Key[] FactionKeys = new Key[]
+    {
+        Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6
+    };
+
     private void Start()
     {
-    #if DEVELOPMENT_BUILD || UNITY_EDITOR
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
         LoadScenario();
-    #endif
+#endif
     }
-    
+
     private void LoadScenario()
     {
         if (testScenarioFile == null)
@@ -24,49 +27,57 @@ public class DevCheats : MonoBehaviour
             Debug.LogError("[DevCheat] Test scenario file not assigned!");
             return;
         }
-        
+
         try
         {
             scenario = JsonConvert.DeserializeObject<TestScenario>(testScenarioFile.text);
-            Debug.Log($"[DevCheat] Loaded scenario: {scenario.name}");
-            Debug.Log($"[DevCheat] F1: {scenario.factions[faction1Index].name}");
-            Debug.Log($"[DevCheat] F2: {scenario.factions[faction2Index].name}");
+            Debug.Log($"[DevCheat] Loaded scenario: {scenario.name} ({scenario.factions.Count} factions)");
+            for (int i = 0; i < scenario.factions.Count; i++)
+            {
+                Debug.Log($"[DevCheat] F{i + 1}: {scenario.factions[i].name}");
+            }
         }
         catch (System.Exception e)
         {
             Debug.LogError($"[DevCheat] Failed to load scenario: {e.Message}");
         }
     }
-    
+
     private void Update()
     {
-    #if DEVELOPMENT_BUILD || UNITY_EDITOR
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
         if (scenario == null || Keyboard.current == null) return;
 
-        if (Keyboard.current.f1Key.wasPressedThisFrame) AutoSubmit(faction1Index);
-        if (Keyboard.current.f2Key.wasPressedThisFrame) AutoSubmit(faction2Index);
-    #endif
+        for (int i = 0; i < FactionKeys.Length; i++)
+        {
+            if (Keyboard.current[FactionKeys[i]].wasPressedThisFrame)
+            {
+                AutoSubmit(i);
+                break;
+            }
+        }
+#endif
     }
-    
+
     private void AutoSubmit(int factionIndex)
     {
         if (factionIndex >= scenario.factions.Count)
         {
-            Debug.LogWarning($"[DevCheat] Faction index {factionIndex} out of range");
+            Debug.LogWarning($"[DevCheat] Faction index {factionIndex} out of range (scenario has {scenario.factions.Count} factions)");
             return;
         }
-        
+
         FactionTestData faction = scenario.factions[factionIndex];
         UIState state = StateManager.Instance.CurrentUIState;
-        
+
         SubmitForState(state, faction);
     }
-    
+
     private void SubmitForState(UIState state, FactionTestData faction)
     {
         GameClient client = GameClient.Instance;
         StateManager stateManager = StateManager.Instance;
-        
+
         switch (state)
         {
             case UIState.GAME_CONTEXT_INPUT:

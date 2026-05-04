@@ -14,6 +14,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Image attackIcon;
     [SerializeField] private Image defenseIcon;
     [SerializeField] private GameObject bothIcons;
+    [SerializeField] private Image selfIcon;
 
     private string playerId;
     private StateManager stateManager;
@@ -33,6 +34,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         attackIcon.gameObject.SetActive(false);
         defenseIcon.gameObject.SetActive(false);
         bothIcons.SetActive(false);
+        selfIcon.gameObject.SetActive(false);
         Refresh();
     }
 
@@ -66,6 +68,15 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         scoreText.text = "-";
 
         if (string.IsNullOrEmpty(playerId)) return;
+
+        if (playerId == stateManager.CurrentClientState.PlayerId)
+        {
+            selfIcon.gameObject.SetActive(true);
+        }
+        else
+        {
+            selfIcon.gameObject.SetActive(false);
+        }
 
         Player player = stateManager.GetPlayerById(playerId);
         if (player == null)

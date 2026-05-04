@@ -1397,8 +1397,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBAA8\uB4E0 \uD50C\uB808\uC774\uC5B4\uAC00 \uC900\uBE44\uB418\uBA74 \uAC8C\uC784\uC774
-    \uC2DC\uC791\uB429\uB2C8\uB2E4"
+  m_text: "\uBAA8\uB4E0 \uD50C\uB808\uC774\uC5B4\uAC00 \uC900\uBE44\uB418\uC5B4\uC57C
+    \uAC8C\uC784\uC774 \uC2DC\uC791 \uAC00\uB2A5\uD569\uB2C8\uB2E4"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9a78f99f5d171194498a566735ebd0aa, type: 2}
   m_sharedMaterial: {fileID: -5306203189330960349, guid: 9a78f99f5d171194498a566735ebd0aa, type: 2}
@@ -3795,9 +3795,9 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 25
+  m_Spacing: 40
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -5147,7 +5147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a1d0abe263d6e34bb61936acf4da2cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DevCheats
-  testScenarioFile: {fileID: 4900000, guid: 60c11e22a2084994fbeb215e84bee877, type: 3}
+  testScenarioFile: {fileID: 4900000, guid: 7f278a1300faea44c9048c2fca124f55, type: 3}
 --- !u!4 &697143824
 Transform:
   m_ObjectHideFlags: 0
@@ -9814,9 +9814,9 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 2
-  m_Spacing: 25
+  m_Spacing: 40
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0

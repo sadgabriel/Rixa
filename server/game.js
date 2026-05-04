@@ -21,8 +21,21 @@ export const GamePhase = Object.freeze({
     END: 'end',
 });
 
-const TOTAL_ROUNDS = 6;
-const MAX_RESOURCE = 3;
+const ROUNDS_BY_PLAYER_COUNT = {
+    2: 2,
+    3: 4,
+    4: 6,
+    5: 4,
+    6: 5,
+};
+
+function getTotalRounds(playerCount) {
+    return ROUNDS_BY_PLAYER_COUNT[playerCount] ?? 6;
+}
+
+function getMaxResource(totalRounds) {
+    return totalRounds <= 4 ? 1 : 2;
+}
 
 export class Game {
     constructor(judge, name = "new game") {
@@ -38,6 +51,8 @@ export class Game {
         this.roundOffsets = [];
         this.playerCycle = [];
         this.setupOffset = 0;
+        this.totalRounds = 6;
+        this.maxResource = 2;
     }
 
     _checkPhase(required) {
@@ -135,6 +150,9 @@ export class Game {
             throw new Errors.NotEnoughPlayersError();
         }
 
+        this.totalRounds = getTotalRounds(this.players.length);
+        this.maxResource = getMaxResource(this.totalRounds)
+
         this.round = 1;
         this._createFactions();
         this.playerCycle = shuffle(this.players);
@@ -211,7 +229,7 @@ export class Game {
             faction.description = factionResult.summary;
             faction.resources = factionResult.resources;
             for (const resource of faction.resources) {
-                resource.count = MAX_RESOURCE;
+                resource.count = this.maxResource;
             }
         }
         console.log("Context setup complete.");
@@ -244,7 +262,7 @@ export class Game {
         }
         
         this.roundOffsets = [];
-        for (let round = 0; round < TOTAL_ROUNDS; round++) {
+        for (let round = 0; round < this.totalRounds; round++) {
             this.roundOffsets.push(offsets[round % offsets.length]);
         }
     }
@@ -403,7 +421,7 @@ export class Game {
     endCompetitionFinish() {
         this._checkPhase(GamePhase.COMPETITION_FINISH);
         this.players.forEach(p => p.competitionFinishReady = false);
-        if (this.round >= TOTAL_ROUNDS) {
+        if (this.round >= this.totalRounds) {
             this.phase = GamePhase.END;
         } else {
             this.round += 1;
