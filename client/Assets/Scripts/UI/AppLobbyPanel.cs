@@ -96,12 +96,6 @@ public class AppLobbyPanel : NonPersistentPanel
             onConfirm: (gameName, playerName) =>
             {
                 gameClient.CreateGame(gameName, playerName);
-                audioManager.PlayButtonClick();
-                dialogManager.CloseTopDialog();
-            },
-            onCancel: () =>
-            {
-                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             }
         );
@@ -116,12 +110,6 @@ public class AppLobbyPanel : NonPersistentPanel
             onConfirm: (playerName) =>
             {
                 gameClient.JoinGame(selectedRoom.RoomData.Id, playerName);
-                audioManager.PlayButtonClick();
-                dialogManager.CloseTopDialog();
-            },
-            onCancel: () =>
-            {
-                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             }
         );

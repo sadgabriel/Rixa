@@ -32,9 +32,14 @@ public class FactionDialog : Dialog, ICancelable
 
     public void OnCancel()
     {
+        audioManager.PlayButtonClick();
         if (onCancelCallback != null)
         {
             onCancelCallback.Invoke();
+        }
+        else
+        {
+            dialogManager.CloseTopDialog();
         }
     }
 }

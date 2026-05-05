@@ -21,6 +21,7 @@ public class DialogManager : MonoBehaviour
     [SerializeField] private GameObject modalBackground;
     [SerializeField] private Transform dialogContainer;
 
+    [SerializeField] private GameObject notificationDialogPrefab;
     [SerializeField] private GameObject confirmationDialogPrefab;
     [SerializeField] private GameObject createGameDialogPrefab;
     [SerializeField] private GameObject joinGameDialogPrefab;
@@ -63,9 +64,6 @@ public class DialogManager : MonoBehaviour
                     {
                         Application.Quit();
                         CloseTopDialog();
-                    }, () =>
-                    {
-                        CloseTopDialog();
                     });
                 }
             } else if (Keyboard.current.enterKey.wasPressedThisFrame)
@@ -90,6 +88,14 @@ public class DialogManager : MonoBehaviour
         {
             instance = null;
         }
+    }
+
+    public void ShowNotificationDialog(string message, Action onCancel = null)
+    {
+        GameObject dialogGO = ShowDialog(notificationDialogPrefab);
+        NotificationDialog notificationDialog = dialogGO.GetComponent<NotificationDialog>();
+        notificationDialog?.SetMessage(message);
+        notificationDialog?.SetCallbacks(onCancel);
     }
 
     public void ShowConfirmationDialog(string message, Action onConfirm, Action onCancel = null)
@@ -151,6 +157,11 @@ public class DialogManager : MonoBehaviour
             if (dialogStack.Count == 0)
             {
                 modalBackground.SetActive(false);
+            }
+            else
+            {
+                modalBackground.transform.SetAsLastSibling();
+                dialogStack.Peek().transform.SetAsLastSibling();
             }
         }
     }

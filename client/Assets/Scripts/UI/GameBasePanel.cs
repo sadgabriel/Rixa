@@ -339,12 +339,6 @@ public class GameBasePanel : PersistentPanel
             onConfirm: () =>
             {
                 gameClient.LeaveGame();
-                audioManager.PlayButtonClick();
-                dialogManager.CloseTopDialog();
-            },
-            onCancel: () =>
-            {
-                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             }
         );
@@ -391,18 +385,12 @@ public class GameBasePanel : PersistentPanel
         dialogManager.ShowFactionNameInputDialog(
             onConfirm: factionName =>
             {
-                audioManager.PlayButtonClick();
                 if (string.IsNullOrEmpty(factionName))
                 {
                     Debug.LogWarning("Faction name input is empty");
                     return;
                 }
                 gameClient.SubmitFactionConcept(concept, factionName);
-                dialogManager.CloseTopDialog();
-            },
-            onCancel: () =>
-            {
-                audioManager.PlayButtonClick();
                 dialogManager.CloseTopDialog();
             }
         );

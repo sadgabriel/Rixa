@@ -12801,7 +12801,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogManager
   modalBackground: {fileID: 1451324945}
   dialogContainer: {fileID: 1222860549}
-  confirmationDialogPrefab: {fileID: 7408711471061630097, guid: eec900e28a88d474ea0e24b58b5919ad, type: 3}
+  notificationDialogPrefab: {fileID: 7408711471061630097, guid: eec900e28a88d474ea0e24b58b5919ad, type: 3}
+  confirmationDialogPrefab: {fileID: 7408711471061630097, guid: 68eb3ea94a22d7d4aaa1ed1607ddd12d, type: 3}
   createGameDialogPrefab: {fileID: 7800550403556056558, guid: b198b1474f430034c8bbdbd074df4dde, type: 3}
   joinGameDialogPrefab: {fileID: 7408711471061630097, guid: 0123e80edcb91f546bac58d9a2e7da29, type: 3}
   factionDialogPrefab: {fileID: 685665648982774487, guid: 39096bb13ab2c3e4289dd8c89ebc8f88, type: 3}
