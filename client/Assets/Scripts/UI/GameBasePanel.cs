@@ -365,7 +365,12 @@ public class GameBasePanel : PersistentPanel
         string context = inputField.text.Trim();
         if (string.IsNullOrEmpty(context))
         {
-            Debug.LogWarning("Context input is empty");
+            dialogManager.ShowNotificationDialog("배경 설정을 입력해주세요.");
+            return;
+        }
+        if (context.Length > 100)
+        {
+            dialogManager.ShowNotificationDialog("배경 설정은 100자 이하로 입력해주세요.");
             return;
         }
 
@@ -378,7 +383,7 @@ public class GameBasePanel : PersistentPanel
         string concept = inputField.text.Trim();
         if (string.IsNullOrEmpty(concept))
         {
-            Debug.LogWarning("Faction concept input is empty");
+            dialogManager.ShowNotificationDialog("진영 컨셉을 입력해주세요.");
             return;
         }
         
@@ -387,7 +392,12 @@ public class GameBasePanel : PersistentPanel
             {
                 if (string.IsNullOrEmpty(factionName))
                 {
-                    Debug.LogWarning("Faction name input is empty");
+                    dialogManager.ShowNotificationDialog("팩션 이름을 입력해주세요.");
+                    return;
+                }
+                if (factionName.Length > 8)
+                {
+                    dialogManager.ShowNotificationDialog("팩션 이름은 8자 이하로 입력해주세요.");
                     return;
                 }
                 gameClient.SubmitFactionConcept(concept, factionName);
@@ -402,7 +412,12 @@ public class GameBasePanel : PersistentPanel
         string flaw = inputField.text.Trim();
         if (string.IsNullOrEmpty(flaw))
         {
-            Debug.LogWarning("Faction flaw input is empty");
+            dialogManager.ShowNotificationDialog("진영의 약점을 입력해주세요.");
+            return;
+        }
+        if (flaw.Length > 100)
+        {
+            dialogManager.ShowNotificationDialog("약점 설명은 100자 이하로 입력해주세요.");
             return;
         }
 
@@ -421,7 +436,12 @@ public class GameBasePanel : PersistentPanel
         string attack = inputField.text.Trim();
         if (string.IsNullOrEmpty(attack))
         {
-            Debug.LogWarning("Attack input is empty");
+            dialogManager.ShowNotificationDialog("공격 내용을 입력해주세요.");
+            return;
+        }
+        if (attack.Length > 100)
+        {
+            dialogManager.ShowNotificationDialog("공격 설명은 100자 이하로 입력해주세요.");
             return;
         }
         gameClient.SubmitAttack(attack);
@@ -433,7 +453,12 @@ public class GameBasePanel : PersistentPanel
         string defense = inputField.text.Trim();
         if (string.IsNullOrEmpty(defense))
         {
-            Debug.LogWarning("Defense input is empty");
+            dialogManager.ShowNotificationDialog("방어 내용을 입력해주세요.");
+            return;
+        }
+        if (defense.Length > 100)
+        {
+            dialogManager.ShowNotificationDialog("방어 설명은 100자 이하로 입력해주세요.");
             return;
         }
         gameClient.SubmitDefense(defense);
