@@ -253,6 +253,9 @@ async function handleGameSubmit(client, data) {
                 game.reset();
             }
             break;
+        case "cancel":
+            game.cancelSubmission(client.playerId);
+            break;
     }
 
     broadcastGameState(game);

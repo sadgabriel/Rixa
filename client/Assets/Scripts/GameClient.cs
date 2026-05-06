@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 
 public class GameClient : MonoBehaviour
 {
@@ -164,6 +165,11 @@ public class GameClient : MonoBehaviour
     public void SetCompetitionFinishReady()
     {
         Submit("competitionFinishReady", new { });
+    }
+
+    public void CancelSubmission()
+    {
+        Submit("cancel", new { });
     }
 
     private void Submit(string kind, object payload)

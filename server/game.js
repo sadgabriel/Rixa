@@ -430,6 +430,41 @@ export class Game {
         }
     }
 
+    cancelSubmission(playerId) {
+        const player = this.getPlayer(playerId);
+        
+        switch (this.phase) {
+            case GamePhase.FACTION_CONCEPT_INPUT:
+                const faction = this.getFaction(player.factionId);
+                faction.rawConcept = null;
+                faction.name = null;
+                break;
+            
+            case GamePhase.FACTION_FLAW_INPUT:
+                const playerIndex = this.players.findIndex(p => p.id === playerId);
+                const anotherPlayerIndex = (playerIndex + this.setupOffset) % this.players.length;
+                const anotherPlayer = this.players[anotherPlayerIndex];
+                const anotherFaction = this.getFaction(anotherPlayer.factionId);
+                anotherFaction.rawFlaw = null;
+                break;
+            
+            case GamePhase.ATTACK:
+                const attackFaction = this.getFaction(player.factionId);
+                const attackMatch = this.getMatchByAttacker(attackFaction.id);
+                attackMatch.attackDescription = null;
+                break;
+            
+            case GamePhase.DEFENSE:
+                const defenseFaction = this.getFaction(player.factionId);
+                const defenseMatch = this.getMatchByDefender(defenseFaction.id);
+                defenseMatch.defenseDescription = null;
+                break;
+            
+            default:
+                break;
+        }
+    }
+
     reset() {
         this.phase = GamePhase.LOBBY;
         this.judge.resetSession();

@@ -11,7 +11,7 @@ public class GameBasePanel : PersistentPanel
     [SerializeField] private Transform playerDataRightContainer;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private Button mainButton;
-    [SerializeField] private Button ExitButton;
+    [SerializeField] private Button subButton;
     [SerializeField] private GameObject playerDataItemPrefab;
 
     private List<PlayerDataItem> playerDataItems = new List<PlayerDataItem>();
@@ -68,20 +68,44 @@ public class GameBasePanel : PersistentPanel
 
     private void SetupUIForState(UIState state)
     {
-        SetupExitButton(state);
+        SetupSubButton(state);
         SetupMainButton(state);
         SetupInputField(state);
     }
 
     private void UpdateUIForState(UIState state)
     {
+        UpdateSubButton(state);
         UpdateMainButton(state);
         UpdateInputField(state);
     }
 
-    private void SetupExitButton(UIState state)
+    private void SetupSubButton(UIState state)
     {
-        ExitButton.gameObject.SetActive(state == UIState.GAME_LOBBY);
+        subButton.onClick.RemoveAllListeners();
+        var buttonText = subButton.GetComponentInChildren<TextMeshProUGUI>();
+        switch (state)
+        {
+            case UIState.GAME_LOBBY:
+                subButton.gameObject.SetActive(true);
+                subButton.interactable = true;
+                buttonText.text = "게임 나가기";
+                subButton.onClick.AddListener(OnExitButtonClicked);
+                break;
+            case UIState.GAME_FACTION_CONCEPT_INPUT:
+            case UIState.GAME_FACTION_FLAW_INPUT:
+            case UIState.GAME_ATTACK:
+            case UIState.GAME_DEFENSE:
+                subButton.gameObject.SetActive(true);
+                subButton.interactable = false;
+                buttonText.text = "제출 취소";
+                subButton.onClick.AddListener(OnCancelButtonClicked);
+                break;
+            default:
+                subButton.gameObject.SetActive(false);
+                break;
+        }
+        
     }
 
     private void SetupMainButton(UIState state)
@@ -168,6 +192,20 @@ public class GameBasePanel : PersistentPanel
                 break;
             default:
                 inputField.interactable = false;
+                break;
+        }
+    }
+
+    private void UpdateSubButton(UIState state)
+    {
+        bool hasSubmitted = HasAlreadySubmitted(state);
+        switch (state)
+        {
+            case UIState.GAME_FACTION_CONCEPT_INPUT:
+            case UIState.GAME_FACTION_FLAW_INPUT:
+            case UIState.GAME_ATTACK:
+            case UIState.GAME_DEFENSE:
+                subButton.interactable = hasSubmitted;
                 break;
         }
     }
@@ -342,6 +380,12 @@ public class GameBasePanel : PersistentPanel
                 dialogManager.CloseTopDialog();
             }
         );
+    }
+
+    public void OnCancelButtonClicked()
+    {
+        audioManager.PlayButtonClick();
+        gameClient.CancelSubmission();
     }
 
     private void OnReadyButtonClicked()
