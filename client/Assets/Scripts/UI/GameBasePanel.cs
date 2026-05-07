@@ -412,9 +412,9 @@ public class GameBasePanel : PersistentPanel
             dialogManager.ShowNotificationDialog("배경 설정을 입력해주세요.");
             return;
         }
-        if (context.Length > 100)
+        if (context.Length > 200)
         {
-            dialogManager.ShowNotificationDialog("배경 설정은 100자 이하로 입력해주세요.");
+            dialogManager.ShowNotificationDialog("배경 설정은 200자 이하로 입력해주세요.");
             return;
         }
 
