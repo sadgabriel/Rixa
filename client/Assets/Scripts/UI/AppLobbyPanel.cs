@@ -106,10 +106,12 @@ public class AppLobbyPanel : NonPersistentPanel
         audioManager.PlayButtonClick();
         if (selectedRoom == null) return;
 
+        string gameId = selectedRoom.RoomData.Id;
+
         dialogManager.ShowJoinGameDialog(
             onConfirm: (playerName) =>
             {
-                gameClient.JoinGame(selectedRoom.RoomData.Id, playerName);
+                gameClient.JoinGame(gameId, playerName);
                 dialogManager.CloseTopDialog();
             }
         );
