@@ -175,11 +175,11 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
 
         if (resources != null && resources.Count >= 3)
         {
-            dialogManager.ShowFactionDialog(factionName, factionDescription, resources[0].Name, resources[0].Count, resources[1].Name, resources[1].Count, resources[2].Name, resources[2].Count);
+            dialogManager.ShowFactionDialog(factionName, factionDescription, resources[0].Name, resources[0].Count, resources[0].Description, resources[1].Name, resources[1].Count, resources[1].Description, resources[2].Name, resources[2].Count, resources[2].Description);
         }
         else
         {
-            dialogManager.ShowFactionDialog(factionName, factionDescription, "자원명 1", 0, "자원명 2", 0, "자원명 3", 0);
+            dialogManager.ShowFactionDialog(factionName, factionDescription, "자원명 1", 0, "자원 설명 1", "자원명 2", 0, "자원 설명 2", "자원명 3", 0, "자원 설명 3");
         }
     }
 }

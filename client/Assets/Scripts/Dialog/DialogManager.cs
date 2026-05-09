@@ -120,12 +120,12 @@ public class DialogManager : MonoBehaviour
         joinGameDialog?.SetCallbacks(onConfirm, onCancel);
     }
 
-    public void ShowFactionDialog(string factionName, string factionDescription, string resourceName1, int resourceValue1, string resourceName2, int resourceValue2, string resourceName3, int resourceValue3, Action onCancel = null)
+    public void ShowFactionDialog(string factionName, string factionDescription, string resourceName1, int resourceValue1, string resourceDescription1, string resourceName2, int resourceValue2, string resourceDescription2, string resourceName3, int resourceValue3, string resourceDescription3, Action onCancel = null)
     {
         GameObject dialogGO = ShowDialog(factionDialogPrefab);
         FactionDialog factionDialog = dialogGO.GetComponent<FactionDialog>();
         factionDialog?.SetFactionInfo(factionName, factionDescription);
-        factionDialog?.SetResourceInfo(resourceName1, resourceValue1, resourceName2, resourceValue2, resourceName3, resourceValue3);
+        factionDialog?.SetResourceInfo(resourceName1, resourceValue1, resourceDescription1, resourceName2, resourceValue2, resourceDescription2, resourceName3, resourceValue3, resourceDescription3);
         factionDialog?.SetCallback(onCancel);
     }
 
