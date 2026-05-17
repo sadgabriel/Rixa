@@ -117,6 +117,10 @@ Key implementation details:
 
 ---
 
+For a detailed breakdown of the architecture, see the [Architecture Document](Architecture.md).
+
+---
+
 ## 6. Game Flow
 
 ```
