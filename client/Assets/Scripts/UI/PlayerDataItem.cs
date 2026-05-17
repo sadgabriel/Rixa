@@ -93,6 +93,8 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
             scoreText.text = $"{faction.Score}";
         }
 
+        Faction anotherFaction = stateManager.GetAnotherFactionByPlayerId(playerId);
+
         if (currentState == UIState.GAME_ATTACK)
         {
             attackIcon.gameObject.SetActive(false);
@@ -124,7 +126,7 @@ public class PlayerDataItem : MonoBehaviour, IPointerClickHandler
         {
             statusIndicator.ShowCompleted();
         }
-        else if (stateManager.CurrentUIState == UIState.GAME_FACTION_FLAW_INPUT && !string.IsNullOrEmpty(faction.RawFlaw))
+        else if (stateManager.CurrentUIState == UIState.GAME_FACTION_FLAW_INPUT && !string.IsNullOrEmpty(anotherFaction?.RawFlaw))
         {
             statusIndicator.ShowCompleted();
         }

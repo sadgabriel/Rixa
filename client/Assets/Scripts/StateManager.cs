@@ -309,6 +309,29 @@ public class StateManager : MonoBehaviour
         return CurrentGameState.Players.Find(p => p.FactionId == factionId);
     }
 
+    public Faction GetAnotherFactionByPlayerId(string playerId)
+    {
+        if (!IsInGame() || currentGameState.Players == null || currentGameState.Factions == null || currentGameState.SetupOffset == 0)
+        {
+            return null;
+        }
+
+        int myIndex = 0;
+        while (myIndex < currentGameState.Players.Count && currentGameState.Players[myIndex].Id != playerId)
+        {
+            myIndex++;
+        }
+
+        if (myIndex < currentGameState.Players.Count)
+        {
+            int anotherIndex = (myIndex + currentGameState.SetupOffset) % currentGameState.Players.Count;
+            Faction anotherFaction = GetFactionById(currentGameState.Players[anotherIndex].FactionId);
+            return anotherFaction;
+        }
+
+        return null;
+    }
+
     private void Awake()
     {
         if (instance == null)
